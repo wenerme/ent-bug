@@ -25,5 +25,9 @@ func (AuditorMixin) Indexes() []ent.Index {
 func (AuditorMixin) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("createdBy", User.Type).From("creator").Field("createdByID").Unique(),
+		//edge.To("created", User.Type),
+		//edge.From("createdBy", User.Type).
+		//	Unique().
+		//	Field("createdByID"),
 	}
 }
