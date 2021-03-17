@@ -32,9 +32,32 @@ func (uc *UserCreate) SetNillableCreatedByID(i *int) *UserCreate {
 	return uc
 }
 
-// SetCreatedBy sets the "createdBy" edge to the User entity.
-func (uc *UserCreate) SetCreatedBy(u *User) *UserCreate {
-	return uc.SetCreatedByID(u.ID)
+// SetCreatorID sets the "creator" edge to the User entity by ID.
+func (uc *UserCreate) SetCreatorID(id int) *UserCreate {
+	uc.mutation.SetCreatorID(id)
+	return uc
+}
+
+// SetNillableCreatorID sets the "creator" edge to the User entity by ID if the given value is not nil.
+func (uc *UserCreate) SetNillableCreatorID(id *int) *UserCreate {
+	if id != nil {
+		uc = uc.SetCreatorID(*id)
+	}
+	return uc
+}
+
+// SetCreator sets the "creator" edge to the User entity.
+func (uc *UserCreate) SetCreator(u *User) *UserCreate {
+	return uc.SetCreatorID(u.ID)
+}
+
+// AddCreatedBy adds the "createdBy" edges to the User entity.
+func (uc *UserCreate) AddCreatedBy(u ...*User) *UserCreate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uc.AddCreatedByIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -115,13 +138,13 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			},
 		}
 	)
-	if nodes := uc.mutation.CreatedByIDs(); len(nodes) > 0 {
+	if nodes := uc.mutation.CreatorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   user.CreatedByTable,
-			Columns: []string{user.CreatedByColumn},
-			Bidi:    true,
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   user.CreatorTable,
+			Columns: []string{user.CreatorColumn},
+			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
@@ -133,6 +156,25 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.CreatedByID = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.CreatedByIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CreatedByTable,
+			Columns: []string{user.CreatedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: user.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

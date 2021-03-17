@@ -205,6 +205,22 @@ func (c *UserClient) GetX(ctx context.Context, id int) *User {
 	return obj
 }
 
+// QueryCreator queries the creator edge of a User.
+func (c *UserClient) QueryCreator(u *User) *UserQuery {
+	query := &UserQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, user.CreatorTable, user.CreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryCreatedBy queries the createdBy edge of a User.
 func (c *UserClient) QueryCreatedBy(u *User) *UserQuery {
 	query := &UserQuery{config: c.config}
@@ -213,7 +229,7 @@ func (c *UserClient) QueryCreatedBy(u *User) *UserQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, user.CreatedByTable, user.CreatedByColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.CreatedByTable, user.CreatedByColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil

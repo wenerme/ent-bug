@@ -24,22 +24,33 @@ type User struct {
 
 // UserEdges holds the relations/edges for other nodes in the graph.
 type UserEdges struct {
+	// Creator holds the value of the creator edge.
+	Creator *User `json:"creator,omitempty"`
 	// CreatedBy holds the value of the createdBy edge.
-	CreatedBy *User `json:"createdBy,omitempty"`
+	CreatedBy []*User `json:"createdBy,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
-// CreatedByOrErr returns the CreatedBy value or an error if the edge
+// CreatorOrErr returns the Creator value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e UserEdges) CreatedByOrErr() (*User, error) {
+func (e UserEdges) CreatorOrErr() (*User, error) {
 	if e.loadedTypes[0] {
-		if e.CreatedBy == nil {
-			// The edge createdBy was loaded in eager-loading,
+		if e.Creator == nil {
+			// The edge creator was loaded in eager-loading,
 			// but was not found.
 			return nil, &NotFoundError{label: user.Label}
 		}
+		return e.Creator, nil
+	}
+	return nil, &NotLoadedError{edge: "creator"}
+}
+
+// CreatedByOrErr returns the CreatedBy value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) CreatedByOrErr() ([]*User, error) {
+	if e.loadedTypes[1] {
 		return e.CreatedBy, nil
 	}
 	return nil, &NotLoadedError{edge: "createdBy"}
@@ -83,6 +94,11 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 		}
 	}
 	return nil
+}
+
+// QueryCreator queries the "creator" edge of the User entity.
+func (u *User) QueryCreator() *UserQuery {
+	return (&UserClient{config: u.config}).QueryCreator(u)
 }
 
 // QueryCreatedBy queries the "createdBy" edge of the User entity.

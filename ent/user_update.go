@@ -47,9 +47,32 @@ func (uu *UserUpdate) ClearCreatedByID() *UserUpdate {
 	return uu
 }
 
-// SetCreatedBy sets the "createdBy" edge to the User entity.
-func (uu *UserUpdate) SetCreatedBy(u *User) *UserUpdate {
-	return uu.SetCreatedByID(u.ID)
+// SetCreatorID sets the "creator" edge to the User entity by ID.
+func (uu *UserUpdate) SetCreatorID(id int) *UserUpdate {
+	uu.mutation.SetCreatorID(id)
+	return uu
+}
+
+// SetNillableCreatorID sets the "creator" edge to the User entity by ID if the given value is not nil.
+func (uu *UserUpdate) SetNillableCreatorID(id *int) *UserUpdate {
+	if id != nil {
+		uu = uu.SetCreatorID(*id)
+	}
+	return uu
+}
+
+// SetCreator sets the "creator" edge to the User entity.
+func (uu *UserUpdate) SetCreator(u *User) *UserUpdate {
+	return uu.SetCreatorID(u.ID)
+}
+
+// AddCreatedBy adds the "createdBy" edges to the User entity.
+func (uu *UserUpdate) AddCreatedBy(u ...*User) *UserUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uu.AddCreatedByIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -57,10 +80,31 @@ func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
 }
 
-// ClearCreatedBy clears the "createdBy" edge to the User entity.
+// ClearCreator clears the "creator" edge to the User entity.
+func (uu *UserUpdate) ClearCreator() *UserUpdate {
+	uu.mutation.ClearCreator()
+	return uu
+}
+
+// ClearCreatedBy clears all "createdBy" edges to the User entity.
 func (uu *UserUpdate) ClearCreatedBy() *UserUpdate {
 	uu.mutation.ClearCreatedBy()
 	return uu
+}
+
+// RemoveCreatedByIDs removes the "createdBy" edge to User entities by IDs.
+func (uu *UserUpdate) RemoveCreatedByIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveCreatedByIDs(ids...)
+	return uu
+}
+
+// RemoveCreatedBy removes "createdBy" edges to User entities.
+func (uu *UserUpdate) RemoveCreatedBy(u ...*User) *UserUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uu.RemoveCreatedByIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -132,13 +176,13 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if uu.mutation.CreatedByCleared() {
+	if uu.mutation.CreatorCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   user.CreatedByTable,
-			Columns: []string{user.CreatedByColumn},
-			Bidi:    true,
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   user.CreatorTable,
+			Columns: []string{user.CreatorColumn},
+			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
@@ -148,13 +192,67 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.CreatedByIDs(); len(nodes) > 0 {
+	if nodes := uu.mutation.CreatorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   user.CreatorTable,
+			Columns: []string{user.CreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: user.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.CreatedByCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   user.CreatedByTable,
 			Columns: []string{user.CreatedByColumn},
-			Bidi:    true,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: user.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedCreatedByIDs(); len(nodes) > 0 && !uu.mutation.CreatedByCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CreatedByTable,
+			Columns: []string{user.CreatedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: user.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.CreatedByIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CreatedByTable,
+			Columns: []string{user.CreatedByColumn},
+			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
@@ -206,9 +304,32 @@ func (uuo *UserUpdateOne) ClearCreatedByID() *UserUpdateOne {
 	return uuo
 }
 
-// SetCreatedBy sets the "createdBy" edge to the User entity.
-func (uuo *UserUpdateOne) SetCreatedBy(u *User) *UserUpdateOne {
-	return uuo.SetCreatedByID(u.ID)
+// SetCreatorID sets the "creator" edge to the User entity by ID.
+func (uuo *UserUpdateOne) SetCreatorID(id int) *UserUpdateOne {
+	uuo.mutation.SetCreatorID(id)
+	return uuo
+}
+
+// SetNillableCreatorID sets the "creator" edge to the User entity by ID if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableCreatorID(id *int) *UserUpdateOne {
+	if id != nil {
+		uuo = uuo.SetCreatorID(*id)
+	}
+	return uuo
+}
+
+// SetCreator sets the "creator" edge to the User entity.
+func (uuo *UserUpdateOne) SetCreator(u *User) *UserUpdateOne {
+	return uuo.SetCreatorID(u.ID)
+}
+
+// AddCreatedBy adds the "createdBy" edges to the User entity.
+func (uuo *UserUpdateOne) AddCreatedBy(u ...*User) *UserUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uuo.AddCreatedByIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -216,10 +337,31 @@ func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
 }
 
-// ClearCreatedBy clears the "createdBy" edge to the User entity.
+// ClearCreator clears the "creator" edge to the User entity.
+func (uuo *UserUpdateOne) ClearCreator() *UserUpdateOne {
+	uuo.mutation.ClearCreator()
+	return uuo
+}
+
+// ClearCreatedBy clears all "createdBy" edges to the User entity.
 func (uuo *UserUpdateOne) ClearCreatedBy() *UserUpdateOne {
 	uuo.mutation.ClearCreatedBy()
 	return uuo
+}
+
+// RemoveCreatedByIDs removes the "createdBy" edge to User entities by IDs.
+func (uuo *UserUpdateOne) RemoveCreatedByIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveCreatedByIDs(ids...)
+	return uuo
+}
+
+// RemoveCreatedBy removes "createdBy" edges to User entities.
+func (uuo *UserUpdateOne) RemoveCreatedBy(u ...*User) *UserUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uuo.RemoveCreatedByIDs(ids...)
 }
 
 // Save executes the query and returns the updated User entity.
@@ -296,13 +438,13 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			}
 		}
 	}
-	if uuo.mutation.CreatedByCleared() {
+	if uuo.mutation.CreatorCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   user.CreatedByTable,
-			Columns: []string{user.CreatedByColumn},
-			Bidi:    true,
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   user.CreatorTable,
+			Columns: []string{user.CreatorColumn},
+			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
@@ -312,13 +454,67 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.CreatedByIDs(); len(nodes) > 0 {
+	if nodes := uuo.mutation.CreatorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   user.CreatorTable,
+			Columns: []string{user.CreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: user.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.CreatedByCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   user.CreatedByTable,
 			Columns: []string{user.CreatedByColumn},
-			Bidi:    true,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: user.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedCreatedByIDs(); len(nodes) > 0 && !uuo.mutation.CreatedByCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CreatedByTable,
+			Columns: []string{user.CreatedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: user.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.CreatedByIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CreatedByTable,
+			Columns: []string{user.CreatedByColumn},
+			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,

@@ -32,7 +32,10 @@ type UserMutation struct {
 	typ              string
 	id               *int
 	clearedFields    map[string]struct{}
-	createdBy        *int
+	creator          *int
+	clearedcreator   bool
+	createdBy        map[int]struct{}
+	removedcreatedBy map[int]struct{}
 	clearedcreatedBy bool
 	done             bool
 	oldValue         func(context.Context) (*User, error)
@@ -120,12 +123,12 @@ func (m *UserMutation) ID() (id int, exists bool) {
 
 // SetCreatedByID sets the "createdByID" field.
 func (m *UserMutation) SetCreatedByID(i int) {
-	m.createdBy = &i
+	m.creator = &i
 }
 
 // CreatedByID returns the value of the "createdByID" field in the mutation.
 func (m *UserMutation) CreatedByID() (r int, exists bool) {
-	v := m.createdBy
+	v := m.creator
 	if v == nil {
 		return
 	}
@@ -151,7 +154,7 @@ func (m *UserMutation) OldCreatedByID(ctx context.Context) (v *int, err error) {
 
 // ClearCreatedByID clears the value of the "createdByID" field.
 func (m *UserMutation) ClearCreatedByID() {
-	m.createdBy = nil
+	m.creator = nil
 	m.clearedFields[user.FieldCreatedByID] = struct{}{}
 }
 
@@ -163,8 +166,47 @@ func (m *UserMutation) CreatedByIDCleared() bool {
 
 // ResetCreatedByID resets all changes to the "createdByID" field.
 func (m *UserMutation) ResetCreatedByID() {
-	m.createdBy = nil
+	m.creator = nil
 	delete(m.clearedFields, user.FieldCreatedByID)
+}
+
+// SetCreatorID sets the "creator" edge to the User entity by id.
+func (m *UserMutation) SetCreatorID(id int) {
+	m.creator = &id
+}
+
+// ClearCreator clears the "creator" edge to the User entity.
+func (m *UserMutation) ClearCreator() {
+	m.clearedcreator = true
+}
+
+// CreatorCleared returns if the "creator" edge to the User entity was cleared.
+func (m *UserMutation) CreatorCleared() bool {
+	return m.clearedcreator
+}
+
+// CreatorID returns the "creator" edge ID in the mutation.
+func (m *UserMutation) CreatorID() (id int, exists bool) {
+	if m.creator != nil {
+		return *m.creator, true
+	}
+	return
+}
+
+// CreatorIDs returns the "creator" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CreatorID instead. It exists only for internal usage by the builders.
+func (m *UserMutation) CreatorIDs() (ids []int) {
+	if id := m.creator; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCreator resets all changes to the "creator" edge.
+func (m *UserMutation) ResetCreator() {
+	m.creator = nil
+	m.clearedcreator = false
 }
 
 // ClearCreatedBy clears the "createdBy" edge to the User entity.
@@ -177,12 +219,28 @@ func (m *UserMutation) CreatedByCleared() bool {
 	return m.clearedcreatedBy
 }
 
+// RemoveCreatedByIDs removes the "createdBy" edge to the User entity by IDs.
+func (m *UserMutation) RemoveCreatedByIDs(ids ...int) {
+	if m.removedcreatedBy == nil {
+		m.removedcreatedBy = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.removedcreatedBy[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedCreatedBy returns the removed IDs of the "createdBy" edge to the User entity.
+func (m *UserMutation) RemovedCreatedByIDs() (ids []int) {
+	for id := range m.removedcreatedBy {
+		ids = append(ids, id)
+	}
+	return
+}
+
 // CreatedByIDs returns the "createdBy" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// CreatedByID instead. It exists only for internal usage by the builders.
 func (m *UserMutation) CreatedByIDs() (ids []int) {
-	if id := m.createdBy; id != nil {
-		ids = append(ids, *id)
+	for id := range m.createdBy {
+		ids = append(ids, id)
 	}
 	return
 }
@@ -191,6 +249,7 @@ func (m *UserMutation) CreatedByIDs() (ids []int) {
 func (m *UserMutation) ResetCreatedBy() {
 	m.createdBy = nil
 	m.clearedcreatedBy = false
+	m.removedcreatedBy = nil
 }
 
 // Op returns the operation name.
@@ -208,7 +267,7 @@ func (m *UserMutation) Type() string {
 // AddedFields().
 func (m *UserMutation) Fields() []string {
 	fields := make([]string, 0, 1)
-	if m.createdBy != nil {
+	if m.creator != nil {
 		fields = append(fields, user.FieldCreatedByID)
 	}
 	return fields
@@ -318,7 +377,10 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
+	if m.creator != nil {
+		edges = append(edges, user.EdgeCreator)
+	}
 	if m.createdBy != nil {
 		edges = append(edges, user.EdgeCreatedBy)
 	}
@@ -329,17 +391,26 @@ func (m *UserMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *UserMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case user.EdgeCreatedBy:
-		if id := m.createdBy; id != nil {
+	case user.EdgeCreator:
+		if id := m.creator; id != nil {
 			return []ent.Value{*id}
 		}
+	case user.EdgeCreatedBy:
+		ids := make([]ent.Value, 0, len(m.createdBy))
+		for id := range m.createdBy {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
+	if m.removedcreatedBy != nil {
+		edges = append(edges, user.EdgeCreatedBy)
+	}
 	return edges
 }
 
@@ -347,13 +418,22 @@ func (m *UserMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
+	case user.EdgeCreatedBy:
+		ids := make([]ent.Value, 0, len(m.removedcreatedBy))
+		for id := range m.removedcreatedBy {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
+	if m.clearedcreator {
+		edges = append(edges, user.EdgeCreator)
+	}
 	if m.clearedcreatedBy {
 		edges = append(edges, user.EdgeCreatedBy)
 	}
@@ -364,6 +444,8 @@ func (m *UserMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *UserMutation) EdgeCleared(name string) bool {
 	switch name {
+	case user.EdgeCreator:
+		return m.clearedcreator
 	case user.EdgeCreatedBy:
 		return m.clearedcreatedBy
 	}
@@ -374,8 +456,8 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *UserMutation) ClearEdge(name string) error {
 	switch name {
-	case user.EdgeCreatedBy:
-		m.ClearCreatedBy()
+	case user.EdgeCreator:
+		m.ClearCreator()
 		return nil
 	}
 	return fmt.Errorf("unknown User unique edge %s", name)
@@ -385,6 +467,9 @@ func (m *UserMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *UserMutation) ResetEdge(name string) error {
 	switch name {
+	case user.EdgeCreator:
+		m.ResetCreator()
+		return nil
 	case user.EdgeCreatedBy:
 		m.ResetCreatedBy()
 		return nil

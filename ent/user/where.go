@@ -160,13 +160,41 @@ func CreatedByIDNotNil() predicate.User {
 	})
 }
 
+// HasCreator applies the HasEdge predicate on the "creator" edge.
+func HasCreator() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(CreatorTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, CreatorTable, CreatorColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCreatorWith applies the HasEdge predicate on the "creator" edge with a given conditions (other predicates).
+func HasCreatorWith(preds ...predicate.User) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, CreatorTable, CreatorColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasCreatedBy applies the HasEdge predicate on the "createdBy" edge.
 func HasCreatedBy() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(CreatedByTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, CreatedByTable, CreatedByColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, CreatedByTable, CreatedByColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -178,7 +206,7 @@ func HasCreatedByWith(preds ...predicate.User) predicate.User {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, CreatedByTable, CreatedByColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, CreatedByTable, CreatedByColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

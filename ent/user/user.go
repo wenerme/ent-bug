@@ -9,10 +9,16 @@ const (
 	FieldID = "id"
 	// FieldCreatedByID holds the string denoting the createdbyid field in the database.
 	FieldCreatedByID = "created_by_id"
+	// EdgeCreator holds the string denoting the creator edge name in mutations.
+	EdgeCreator = "creator"
 	// EdgeCreatedBy holds the string denoting the createdby edge name in mutations.
 	EdgeCreatedBy = "createdBy"
 	// Table holds the table name of the user in the database.
 	Table = "users"
+	// CreatorTable is the table the holds the creator relation/edge.
+	CreatorTable = "users"
+	// CreatorColumn is the table column denoting the creator relation/edge.
+	CreatorColumn = "created_by_id"
 	// CreatedByTable is the table the holds the createdBy relation/edge.
 	CreatedByTable = "users"
 	// CreatedByColumn is the table column denoting the createdBy relation/edge.
