@@ -4,11 +4,12 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/wenerme/ent/ent/user"
+	"github.com/wenerme/ent-demo/ent/user"
 )
 
 // UserCreate is the builder for creating a User entity.
@@ -18,46 +19,10 @@ type UserCreate struct {
 	hooks    []Hook
 }
 
-// SetCreatedByID sets the "createdByID" field.
-func (uc *UserCreate) SetCreatedByID(i int) *UserCreate {
-	uc.mutation.SetCreatedByID(i)
+// SetName sets the "name" field.
+func (uc *UserCreate) SetName(s string) *UserCreate {
+	uc.mutation.SetName(s)
 	return uc
-}
-
-// SetNillableCreatedByID sets the "createdByID" field if the given value is not nil.
-func (uc *UserCreate) SetNillableCreatedByID(i *int) *UserCreate {
-	if i != nil {
-		uc.SetCreatedByID(*i)
-	}
-	return uc
-}
-
-// SetCreatorID sets the "creator" edge to the User entity by ID.
-func (uc *UserCreate) SetCreatorID(id int) *UserCreate {
-	uc.mutation.SetCreatorID(id)
-	return uc
-}
-
-// SetNillableCreatorID sets the "creator" edge to the User entity by ID if the given value is not nil.
-func (uc *UserCreate) SetNillableCreatorID(id *int) *UserCreate {
-	if id != nil {
-		uc = uc.SetCreatorID(*id)
-	}
-	return uc
-}
-
-// SetCreator sets the "creator" edge to the User entity.
-func (uc *UserCreate) SetCreator(u *User) *UserCreate {
-	return uc.SetCreatorID(u.ID)
-}
-
-// AddCreatedBy adds the "createdBy" edges to the User entity.
-func (uc *UserCreate) AddCreatedBy(u ...*User) *UserCreate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return uc.AddCreatedByIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -111,6 +76,9 @@ func (uc *UserCreate) SaveX(ctx context.Context) *User {
 
 // check runs all checks and user-defined validators on the builder.
 func (uc *UserCreate) check() error {
+	if _, ok := uc.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New("ent: missing required field \"name\"")}
+	}
 	return nil
 }
 
@@ -138,44 +106,13 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			},
 		}
 	)
-	if nodes := uc.mutation.CreatorIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   user.CreatorTable,
-			Columns: []string{user.CreatorColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: user.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.CreatedByID = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := uc.mutation.CreatedByIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.CreatedByTable,
-			Columns: []string{user.CreatedByColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: user.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
+	if value, ok := uc.mutation.Name(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldName,
+		})
+		_node.Name = value
 	}
 	return _node, _spec
 }

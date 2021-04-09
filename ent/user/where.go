@@ -4,8 +4,7 @@ package user
 
 import (
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/wenerme/ent/ent/predicate"
+	"github.com/wenerme/ent-demo/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.
@@ -91,29 +90,29 @@ func IDLTE(id int) predicate.User {
 	})
 }
 
-// CreatedByID applies equality check predicate on the "createdByID" field. It's identical to CreatedByIDEQ.
-func CreatedByID(v int) predicate.User {
+// Name applies equality check predicate on the "name" field. It's identical to NameEQ.
+func Name(v string) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCreatedByID), v))
+		s.Where(sql.EQ(s.C(FieldName), v))
 	})
 }
 
-// CreatedByIDEQ applies the EQ predicate on the "createdByID" field.
-func CreatedByIDEQ(v int) predicate.User {
+// NameEQ applies the EQ predicate on the "name" field.
+func NameEQ(v string) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCreatedByID), v))
+		s.Where(sql.EQ(s.C(FieldName), v))
 	})
 }
 
-// CreatedByIDNEQ applies the NEQ predicate on the "createdByID" field.
-func CreatedByIDNEQ(v int) predicate.User {
+// NameNEQ applies the NEQ predicate on the "name" field.
+func NameNEQ(v string) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldCreatedByID), v))
+		s.Where(sql.NEQ(s.C(FieldName), v))
 	})
 }
 
-// CreatedByIDIn applies the In predicate on the "createdByID" field.
-func CreatedByIDIn(vs ...int) predicate.User {
+// NameIn applies the In predicate on the "name" field.
+func NameIn(vs ...string) predicate.User {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -125,12 +124,12 @@ func CreatedByIDIn(vs ...int) predicate.User {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.In(s.C(FieldCreatedByID), v...))
+		s.Where(sql.In(s.C(FieldName), v...))
 	})
 }
 
-// CreatedByIDNotIn applies the NotIn predicate on the "createdByID" field.
-func CreatedByIDNotIn(vs ...int) predicate.User {
+// NameNotIn applies the NotIn predicate on the "name" field.
+func NameNotIn(vs ...string) predicate.User {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -142,77 +141,70 @@ func CreatedByIDNotIn(vs ...int) predicate.User {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.NotIn(s.C(FieldCreatedByID), v...))
+		s.Where(sql.NotIn(s.C(FieldName), v...))
 	})
 }
 
-// CreatedByIDIsNil applies the IsNil predicate on the "createdByID" field.
-func CreatedByIDIsNil() predicate.User {
+// NameGT applies the GT predicate on the "name" field.
+func NameGT(v string) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldCreatedByID)))
+		s.Where(sql.GT(s.C(FieldName), v))
 	})
 }
 
-// CreatedByIDNotNil applies the NotNil predicate on the "createdByID" field.
-func CreatedByIDNotNil() predicate.User {
+// NameGTE applies the GTE predicate on the "name" field.
+func NameGTE(v string) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldCreatedByID)))
+		s.Where(sql.GTE(s.C(FieldName), v))
 	})
 }
 
-// HasCreator applies the HasEdge predicate on the "creator" edge.
-func HasCreator() predicate.User {
+// NameLT applies the LT predicate on the "name" field.
+func NameLT(v string) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(CreatorTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, CreatorTable, CreatorColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
+		s.Where(sql.LT(s.C(FieldName), v))
 	})
 }
 
-// HasCreatorWith applies the HasEdge predicate on the "creator" edge with a given conditions (other predicates).
-func HasCreatorWith(preds ...predicate.User) predicate.User {
+// NameLTE applies the LTE predicate on the "name" field.
+func NameLTE(v string) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, CreatorTable, CreatorColumn),
-		)
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
+		s.Where(sql.LTE(s.C(FieldName), v))
 	})
 }
 
-// HasCreatedBy applies the HasEdge predicate on the "createdBy" edge.
-func HasCreatedBy() predicate.User {
+// NameContains applies the Contains predicate on the "name" field.
+func NameContains(v string) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(CreatedByTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, CreatedByTable, CreatedByColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
+		s.Where(sql.Contains(s.C(FieldName), v))
 	})
 }
 
-// HasCreatedByWith applies the HasEdge predicate on the "createdBy" edge with a given conditions (other predicates).
-func HasCreatedByWith(preds ...predicate.User) predicate.User {
+// NameHasPrefix applies the HasPrefix predicate on the "name" field.
+func NameHasPrefix(v string) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, CreatedByTable, CreatedByColumn),
-		)
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
+		s.Where(sql.HasPrefix(s.C(FieldName), v))
+	})
+}
+
+// NameHasSuffix applies the HasSuffix predicate on the "name" field.
+func NameHasSuffix(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldName), v))
+	})
+}
+
+// NameEqualFold applies the EqualFold predicate on the "name" field.
+func NameEqualFold(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldName), v))
+	})
+}
+
+// NameContainsFold applies the ContainsFold predicate on the "name" field.
+func NameContainsFold(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldName), v))
 	})
 }
 

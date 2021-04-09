@@ -2,8 +2,9 @@
 
 package runtime
 
-// The schema-stitching logic is generated in github.com/wenerme/ent/ent/runtime.go
+// The schema-stitching logic is generated in github.com/wenerme/ent-demo/ent/runtime.go
 
 const (
-	Version = "(devel)" // Version of ent codegen.
+	Version = "v0.7.0"                                          // Version of ent codegen.
+	Sum     = "h1:E3EjO0cUL61DvUg5ZEZdxa4yTL+4SuZv0LqBExo8CQA=" // Sum of ent codegen.
 )

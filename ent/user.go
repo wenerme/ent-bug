@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/wenerme/ent/ent/user"
+	"github.com/wenerme/ent-demo/ent/user"
 )
 
 // User is the model entity for the User schema.
@@ -15,45 +15,8 @@ type User struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// CreatedByID holds the value of the "createdByID" field.
-	CreatedByID *int `json:"createdByID,omitempty"`
-	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the UserQuery when eager-loading is set.
-	Edges UserEdges `json:"edges"`
-}
-
-// UserEdges holds the relations/edges for other nodes in the graph.
-type UserEdges struct {
-	// Creator holds the value of the creator edge.
-	Creator *User `json:"creator,omitempty"`
-	// CreatedBy holds the value of the createdBy edge.
-	CreatedBy []*User `json:"createdBy,omitempty"`
-	// loadedTypes holds the information for reporting if a
-	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
-}
-
-// CreatorOrErr returns the Creator value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e UserEdges) CreatorOrErr() (*User, error) {
-	if e.loadedTypes[0] {
-		if e.Creator == nil {
-			// The edge creator was loaded in eager-loading,
-			// but was not found.
-			return nil, &NotFoundError{label: user.Label}
-		}
-		return e.Creator, nil
-	}
-	return nil, &NotLoadedError{edge: "creator"}
-}
-
-// CreatedByOrErr returns the CreatedBy value or an error if the edge
-// was not loaded in eager-loading.
-func (e UserEdges) CreatedByOrErr() ([]*User, error) {
-	if e.loadedTypes[1] {
-		return e.CreatedBy, nil
-	}
-	return nil, &NotLoadedError{edge: "createdBy"}
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -61,8 +24,10 @@ func (*User) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case user.FieldID, user.FieldCreatedByID:
+		case user.FieldID:
 			values[i] = &sql.NullInt64{}
+		case user.FieldName:
+			values[i] = &sql.NullString{}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type User", columns[i])
 		}
@@ -84,26 +49,15 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			u.ID = int(value.Int64)
-		case user.FieldCreatedByID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field createdByID", values[i])
+		case user.FieldName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				u.CreatedByID = new(int)
-				*u.CreatedByID = int(value.Int64)
+				u.Name = value.String
 			}
 		}
 	}
 	return nil
-}
-
-// QueryCreator queries the "creator" edge of the User entity.
-func (u *User) QueryCreator() *UserQuery {
-	return (&UserClient{config: u.config}).QueryCreator(u)
-}
-
-// QueryCreatedBy queries the "createdBy" edge of the User entity.
-func (u *User) QueryCreatedBy() *UserQuery {
-	return (&UserClient{config: u.config}).QueryCreatedBy(u)
 }
 
 // Update returns a builder for updating this User.
@@ -129,10 +83,8 @@ func (u *User) String() string {
 	var builder strings.Builder
 	builder.WriteString("User(")
 	builder.WriteString(fmt.Sprintf("id=%v", u.ID))
-	if v := u.CreatedByID; v != nil {
-		builder.WriteString(", createdByID=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
+	builder.WriteString(", name=")
+	builder.WriteString(u.Name)
 	builder.WriteByte(')')
 	return builder.String()
 }

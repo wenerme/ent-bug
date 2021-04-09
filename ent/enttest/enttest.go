@@ -5,9 +5,9 @@ package enttest
 import (
 	"context"
 
-	"github.com/wenerme/ent/ent"
+	"github.com/wenerme/ent-demo/ent"
 	// required by schema hooks.
-	_ "github.com/wenerme/ent/ent/runtime"
+	_ "github.com/wenerme/ent-demo/ent/runtime"
 
 	"entgo.io/ent/dialect/sql/schema"
 )

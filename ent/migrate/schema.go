@@ -8,38 +8,54 @@ import (
 )
 
 var (
-	// UsersColumns holds the columns for the "users" table.
-	UsersColumns = []*schema.Column{
+	// PetsColumns holds the columns for the "pets" table.
+	PetsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "created_by_id", Type: field.TypeInt, Nullable: true},
+		{Name: "owner_id", Type: field.TypeString, Nullable: true},
+		{Name: "owner_type", Type: field.TypeString, Nullable: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "owning_user_id", Type: field.TypeInt, Nullable: true},
 	}
-	// UsersTable holds the schema information for the "users" table.
-	UsersTable = &schema.Table{
-		Name:       "users",
-		Columns:    UsersColumns,
-		PrimaryKey: []*schema.Column{UsersColumns[0]},
+	// PetsTable holds the schema information for the "pets" table.
+	PetsTable = &schema.Table{
+		Name:       "pets",
+		Columns:    PetsColumns,
+		PrimaryKey: []*schema.Column{PetsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "users_users_createdBy",
-				Columns:    []*schema.Column{UsersColumns[1]},
+				Symbol:     "pets_users_owningUser",
+				Columns:    []*schema.Column{PetsColumns[4]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
 		Indexes: []*schema.Index{
 			{
-				Name:    "user_created_by_id",
+				Name:    "pet_owner_type_owner_id",
 				Unique:  false,
-				Columns: []*schema.Column{UsersColumns[1]},
+				Columns: []*schema.Column{PetsColumns[2], PetsColumns[1]},
 			},
 		},
 	}
+	// UsersColumns holds the columns for the "users" table.
+	UsersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+	}
+	// UsersTable holds the schema information for the "users" table.
+	UsersTable = &schema.Table{
+		Name:        "users",
+		Columns:     UsersColumns,
+		PrimaryKey:  []*schema.Column{UsersColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		PetsTable,
 		UsersTable,
 	}
 )
 
 func init() {
-	UsersTable.ForeignKeys[0].RefTable = UsersTable
+	PetsTable.ForeignKeys[0].RefTable = UsersTable
 }

@@ -7,9 +7,10 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/wenerme/ent/ent/migrate"
+	"github.com/wenerme/ent-demo/ent/migrate"
 
-	"github.com/wenerme/ent/ent/user"
+	"github.com/wenerme/ent-demo/ent/pet"
+	"github.com/wenerme/ent-demo/ent/user"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -21,6 +22,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// Pet is the client for interacting with the Pet builders.
+	Pet *PetClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 }
@@ -36,6 +39,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.Pet = NewPetClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -70,6 +74,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:    ctx,
 		config: cfg,
+		Pet:    NewPetClient(cfg),
 		User:   NewUserClient(cfg),
 	}, nil
 }
@@ -89,6 +94,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
 		config: cfg,
+		Pet:    NewPetClient(cfg),
 		User:   NewUserClient(cfg),
 	}, nil
 }
@@ -96,7 +102,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		User.
+//		Pet.
 //		Query().
 //		Count(ctx)
 //
@@ -119,7 +125,112 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
+	c.Pet.Use(hooks...)
 	c.User.Use(hooks...)
+}
+
+// PetClient is a client for the Pet schema.
+type PetClient struct {
+	config
+}
+
+// NewPetClient returns a client for the Pet from the given config.
+func NewPetClient(c config) *PetClient {
+	return &PetClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `pet.Hooks(f(g(h())))`.
+func (c *PetClient) Use(hooks ...Hook) {
+	c.hooks.Pet = append(c.hooks.Pet, hooks...)
+}
+
+// Create returns a create builder for Pet.
+func (c *PetClient) Create() *PetCreate {
+	mutation := newPetMutation(c.config, OpCreate)
+	return &PetCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Pet entities.
+func (c *PetClient) CreateBulk(builders ...*PetCreate) *PetCreateBulk {
+	return &PetCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Pet.
+func (c *PetClient) Update() *PetUpdate {
+	mutation := newPetMutation(c.config, OpUpdate)
+	return &PetUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PetClient) UpdateOne(pe *Pet) *PetUpdateOne {
+	mutation := newPetMutation(c.config, OpUpdateOne, withPet(pe))
+	return &PetUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *PetClient) UpdateOneID(id int) *PetUpdateOne {
+	mutation := newPetMutation(c.config, OpUpdateOne, withPetID(id))
+	return &PetUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Pet.
+func (c *PetClient) Delete() *PetDelete {
+	mutation := newPetMutation(c.config, OpDelete)
+	return &PetDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *PetClient) DeleteOne(pe *Pet) *PetDeleteOne {
+	return c.DeleteOneID(pe.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *PetClient) DeleteOneID(id int) *PetDeleteOne {
+	builder := c.Delete().Where(pet.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &PetDeleteOne{builder}
+}
+
+// Query returns a query builder for Pet.
+func (c *PetClient) Query() *PetQuery {
+	return &PetQuery{config: c.config}
+}
+
+// Get returns a Pet entity by its id.
+func (c *PetClient) Get(ctx context.Context, id int) (*Pet, error) {
+	return c.Query().Where(pet.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *PetClient) GetX(ctx context.Context, id int) *Pet {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryOwningUser queries the owningUser edge of a Pet.
+func (c *PetClient) QueryOwningUser(pe *Pet) *UserQuery {
+	query := &UserQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := pe.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(pet.Table, pet.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, pet.OwningUserTable, pet.OwningUserColumn),
+		)
+		fromV = sqlgraph.Neighbors(pe.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *PetClient) Hooks() []Hook {
+	return c.hooks.Pet
 }
 
 // UserClient is a client for the User schema.
@@ -203,38 +314,6 @@ func (c *UserClient) GetX(ctx context.Context, id int) *User {
 		panic(err)
 	}
 	return obj
-}
-
-// QueryCreator queries the creator edge of a User.
-func (c *UserClient) QueryCreator(u *User) *UserQuery {
-	query := &UserQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, user.CreatorTable, user.CreatorColumn),
-		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryCreatedBy queries the createdBy edge of a User.
-func (c *UserClient) QueryCreatedBy(u *User) *UserQuery {
-	query := &UserQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, user.CreatedByTable, user.CreatedByColumn),
-		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
 }
 
 // Hooks returns the client hooks.
