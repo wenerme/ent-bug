@@ -29,8 +29,16 @@ func (pu *PetUpdate) Where(ps ...predicate.Pet) *PetUpdate {
 }
 
 // SetOwnerID sets the "ownerID" field.
-func (pu *PetUpdate) SetOwnerID(m *models.ID) *PetUpdate {
+func (pu *PetUpdate) SetOwnerID(m models.ID) *PetUpdate {
 	pu.mutation.SetOwnerID(m)
+	return pu
+}
+
+// SetNillableOwnerID sets the "ownerID" field if the given value is not nil.
+func (pu *PetUpdate) SetNillableOwnerID(m *models.ID) *PetUpdate {
+	if m != nil {
+		pu.SetOwnerID(*m)
+	}
 	return pu
 }
 
@@ -61,8 +69,16 @@ func (pu *PetUpdate) ClearOwnerType() *PetUpdate {
 }
 
 // SetOwningUserID sets the "owningUserID" field.
-func (pu *PetUpdate) SetOwningUserID(m *models.ID) *PetUpdate {
+func (pu *PetUpdate) SetOwningUserID(m models.ID) *PetUpdate {
 	pu.mutation.SetOwningUserID(m)
+	return pu
+}
+
+// SetNillableOwningUserID sets the "owningUserID" field if the given value is not nil.
+func (pu *PetUpdate) SetNillableOwningUserID(m *models.ID) *PetUpdate {
+	if m != nil {
+		pu.SetOwningUserID(*m)
+	}
 	return pu
 }
 
@@ -251,8 +267,16 @@ type PetUpdateOne struct {
 }
 
 // SetOwnerID sets the "ownerID" field.
-func (puo *PetUpdateOne) SetOwnerID(m *models.ID) *PetUpdateOne {
+func (puo *PetUpdateOne) SetOwnerID(m models.ID) *PetUpdateOne {
 	puo.mutation.SetOwnerID(m)
+	return puo
+}
+
+// SetNillableOwnerID sets the "ownerID" field if the given value is not nil.
+func (puo *PetUpdateOne) SetNillableOwnerID(m *models.ID) *PetUpdateOne {
+	if m != nil {
+		puo.SetOwnerID(*m)
+	}
 	return puo
 }
 
@@ -283,8 +307,16 @@ func (puo *PetUpdateOne) ClearOwnerType() *PetUpdateOne {
 }
 
 // SetOwningUserID sets the "owningUserID" field.
-func (puo *PetUpdateOne) SetOwningUserID(m *models.ID) *PetUpdateOne {
+func (puo *PetUpdateOne) SetOwningUserID(m models.ID) *PetUpdateOne {
 	puo.mutation.SetOwningUserID(m)
+	return puo
+}
+
+// SetNillableOwningUserID sets the "owningUserID" field if the given value is not nil.
+func (puo *PetUpdateOne) SetNillableOwningUserID(m *models.ID) *PetUpdateOne {
+	if m != nil {
+		puo.SetOwningUserID(*m)
+	}
 	return puo
 }
 

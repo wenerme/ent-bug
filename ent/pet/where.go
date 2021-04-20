@@ -93,7 +93,7 @@ func IDLTE(id models.ID) predicate.Pet {
 }
 
 // OwnerID applies equality check predicate on the "ownerID" field. It's identical to OwnerIDEQ.
-func OwnerID(v *models.ID) predicate.Pet {
+func OwnerID(v models.ID) predicate.Pet {
 	return predicate.Pet(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldOwnerID), v))
 	})
@@ -107,7 +107,7 @@ func OwnerType(v string) predicate.Pet {
 }
 
 // OwningUserID applies equality check predicate on the "owningUserID" field. It's identical to OwningUserIDEQ.
-func OwningUserID(v *models.ID) predicate.Pet {
+func OwningUserID(v models.ID) predicate.Pet {
 	return predicate.Pet(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldOwningUserID), v))
 	})
@@ -121,21 +121,21 @@ func Name(v string) predicate.Pet {
 }
 
 // OwnerIDEQ applies the EQ predicate on the "ownerID" field.
-func OwnerIDEQ(v *models.ID) predicate.Pet {
+func OwnerIDEQ(v models.ID) predicate.Pet {
 	return predicate.Pet(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldOwnerID), v))
 	})
 }
 
 // OwnerIDNEQ applies the NEQ predicate on the "ownerID" field.
-func OwnerIDNEQ(v *models.ID) predicate.Pet {
+func OwnerIDNEQ(v models.ID) predicate.Pet {
 	return predicate.Pet(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldOwnerID), v))
 	})
 }
 
 // OwnerIDIn applies the In predicate on the "ownerID" field.
-func OwnerIDIn(vs ...*models.ID) predicate.Pet {
+func OwnerIDIn(vs ...models.ID) predicate.Pet {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -152,7 +152,7 @@ func OwnerIDIn(vs ...*models.ID) predicate.Pet {
 }
 
 // OwnerIDNotIn applies the NotIn predicate on the "ownerID" field.
-func OwnerIDNotIn(vs ...*models.ID) predicate.Pet {
+func OwnerIDNotIn(vs ...models.ID) predicate.Pet {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -169,30 +169,54 @@ func OwnerIDNotIn(vs ...*models.ID) predicate.Pet {
 }
 
 // OwnerIDGT applies the GT predicate on the "ownerID" field.
-func OwnerIDGT(v *models.ID) predicate.Pet {
+func OwnerIDGT(v models.ID) predicate.Pet {
 	return predicate.Pet(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldOwnerID), v))
 	})
 }
 
 // OwnerIDGTE applies the GTE predicate on the "ownerID" field.
-func OwnerIDGTE(v *models.ID) predicate.Pet {
+func OwnerIDGTE(v models.ID) predicate.Pet {
 	return predicate.Pet(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldOwnerID), v))
 	})
 }
 
 // OwnerIDLT applies the LT predicate on the "ownerID" field.
-func OwnerIDLT(v *models.ID) predicate.Pet {
+func OwnerIDLT(v models.ID) predicate.Pet {
 	return predicate.Pet(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldOwnerID), v))
 	})
 }
 
 // OwnerIDLTE applies the LTE predicate on the "ownerID" field.
-func OwnerIDLTE(v *models.ID) predicate.Pet {
+func OwnerIDLTE(v models.ID) predicate.Pet {
 	return predicate.Pet(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldOwnerID), v))
+	})
+}
+
+// OwnerIDContains applies the Contains predicate on the "ownerID" field.
+func OwnerIDContains(v models.ID) predicate.Pet {
+	vc := string(v)
+	return predicate.Pet(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldOwnerID), vc))
+	})
+}
+
+// OwnerIDHasPrefix applies the HasPrefix predicate on the "ownerID" field.
+func OwnerIDHasPrefix(v models.ID) predicate.Pet {
+	vc := string(v)
+	return predicate.Pet(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldOwnerID), vc))
+	})
+}
+
+// OwnerIDHasSuffix applies the HasSuffix predicate on the "ownerID" field.
+func OwnerIDHasSuffix(v models.ID) predicate.Pet {
+	vc := string(v)
+	return predicate.Pet(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldOwnerID), vc))
 	})
 }
 
@@ -207,6 +231,22 @@ func OwnerIDIsNil() predicate.Pet {
 func OwnerIDNotNil() predicate.Pet {
 	return predicate.Pet(func(s *sql.Selector) {
 		s.Where(sql.NotNull(s.C(FieldOwnerID)))
+	})
+}
+
+// OwnerIDEqualFold applies the EqualFold predicate on the "ownerID" field.
+func OwnerIDEqualFold(v models.ID) predicate.Pet {
+	vc := string(v)
+	return predicate.Pet(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldOwnerID), vc))
+	})
+}
+
+// OwnerIDContainsFold applies the ContainsFold predicate on the "ownerID" field.
+func OwnerIDContainsFold(v models.ID) predicate.Pet {
+	vc := string(v)
+	return predicate.Pet(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldOwnerID), vc))
 	})
 }
 
@@ -336,21 +376,21 @@ func OwnerTypeContainsFold(v string) predicate.Pet {
 }
 
 // OwningUserIDEQ applies the EQ predicate on the "owningUserID" field.
-func OwningUserIDEQ(v *models.ID) predicate.Pet {
+func OwningUserIDEQ(v models.ID) predicate.Pet {
 	return predicate.Pet(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldOwningUserID), v))
 	})
 }
 
 // OwningUserIDNEQ applies the NEQ predicate on the "owningUserID" field.
-func OwningUserIDNEQ(v *models.ID) predicate.Pet {
+func OwningUserIDNEQ(v models.ID) predicate.Pet {
 	return predicate.Pet(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldOwningUserID), v))
 	})
 }
 
 // OwningUserIDIn applies the In predicate on the "owningUserID" field.
-func OwningUserIDIn(vs ...*models.ID) predicate.Pet {
+func OwningUserIDIn(vs ...models.ID) predicate.Pet {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -367,7 +407,7 @@ func OwningUserIDIn(vs ...*models.ID) predicate.Pet {
 }
 
 // OwningUserIDNotIn applies the NotIn predicate on the "owningUserID" field.
-func OwningUserIDNotIn(vs ...*models.ID) predicate.Pet {
+func OwningUserIDNotIn(vs ...models.ID) predicate.Pet {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -384,30 +424,54 @@ func OwningUserIDNotIn(vs ...*models.ID) predicate.Pet {
 }
 
 // OwningUserIDGT applies the GT predicate on the "owningUserID" field.
-func OwningUserIDGT(v *models.ID) predicate.Pet {
+func OwningUserIDGT(v models.ID) predicate.Pet {
 	return predicate.Pet(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldOwningUserID), v))
 	})
 }
 
 // OwningUserIDGTE applies the GTE predicate on the "owningUserID" field.
-func OwningUserIDGTE(v *models.ID) predicate.Pet {
+func OwningUserIDGTE(v models.ID) predicate.Pet {
 	return predicate.Pet(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldOwningUserID), v))
 	})
 }
 
 // OwningUserIDLT applies the LT predicate on the "owningUserID" field.
-func OwningUserIDLT(v *models.ID) predicate.Pet {
+func OwningUserIDLT(v models.ID) predicate.Pet {
 	return predicate.Pet(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldOwningUserID), v))
 	})
 }
 
 // OwningUserIDLTE applies the LTE predicate on the "owningUserID" field.
-func OwningUserIDLTE(v *models.ID) predicate.Pet {
+func OwningUserIDLTE(v models.ID) predicate.Pet {
 	return predicate.Pet(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldOwningUserID), v))
+	})
+}
+
+// OwningUserIDContains applies the Contains predicate on the "owningUserID" field.
+func OwningUserIDContains(v models.ID) predicate.Pet {
+	vc := string(v)
+	return predicate.Pet(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldOwningUserID), vc))
+	})
+}
+
+// OwningUserIDHasPrefix applies the HasPrefix predicate on the "owningUserID" field.
+func OwningUserIDHasPrefix(v models.ID) predicate.Pet {
+	vc := string(v)
+	return predicate.Pet(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldOwningUserID), vc))
+	})
+}
+
+// OwningUserIDHasSuffix applies the HasSuffix predicate on the "owningUserID" field.
+func OwningUserIDHasSuffix(v models.ID) predicate.Pet {
+	vc := string(v)
+	return predicate.Pet(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldOwningUserID), vc))
 	})
 }
 
@@ -422,6 +486,22 @@ func OwningUserIDIsNil() predicate.Pet {
 func OwningUserIDNotNil() predicate.Pet {
 	return predicate.Pet(func(s *sql.Selector) {
 		s.Where(sql.NotNull(s.C(FieldOwningUserID)))
+	})
+}
+
+// OwningUserIDEqualFold applies the EqualFold predicate on the "owningUserID" field.
+func OwningUserIDEqualFold(v models.ID) predicate.Pet {
+	vc := string(v)
+	return predicate.Pet(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldOwningUserID), vc))
+	})
+}
+
+// OwningUserIDContainsFold applies the ContainsFold predicate on the "owningUserID" field.
+func OwningUserIDContainsFold(v models.ID) predicate.Pet {
+	vc := string(v)
+	return predicate.Pet(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldOwningUserID), vc))
 	})
 }
 

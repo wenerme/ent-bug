@@ -89,7 +89,8 @@ func (pe *Pet) assignValues(columns []string, values []interface{}) error {
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field ownerID", values[i])
 			} else if value.Valid {
-				pe.OwnerID = value.S.(*models.ID)
+				pe.OwnerID = new(models.ID)
+				*pe.OwnerID = *value.S.(*models.ID)
 			}
 		case pet.FieldOwnerType:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -102,7 +103,8 @@ func (pe *Pet) assignValues(columns []string, values []interface{}) error {
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field owningUserID", values[i])
 			} else if value.Valid {
-				pe.OwningUserID = value.S.(*models.ID)
+				pe.OwningUserID = new(models.ID)
+				*pe.OwningUserID = *value.S.(*models.ID)
 			}
 		case pet.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {

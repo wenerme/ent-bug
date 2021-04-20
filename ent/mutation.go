@@ -34,7 +34,7 @@ type PetMutation struct {
 	op                Op
 	typ               string
 	id                *models.ID
-	ownerID           **models.ID
+	ownerID           *models.ID
 	ownerType         *string
 	name              *string
 	clearedFields     map[string]struct{}
@@ -131,12 +131,12 @@ func (m *PetMutation) ID() (id models.ID, exists bool) {
 }
 
 // SetOwnerID sets the "ownerID" field.
-func (m *PetMutation) SetOwnerID(value *models.ID) {
+func (m *PetMutation) SetOwnerID(value models.ID) {
 	m.ownerID = &value
 }
 
 // OwnerID returns the value of the "ownerID" field in the mutation.
-func (m *PetMutation) OwnerID() (r *models.ID, exists bool) {
+func (m *PetMutation) OwnerID() (r models.ID, exists bool) {
 	v := m.ownerID
 	if v == nil {
 		return
@@ -229,12 +229,12 @@ func (m *PetMutation) ResetOwnerType() {
 }
 
 // SetOwningUserID sets the "owningUserID" field.
-func (m *PetMutation) SetOwningUserID(value *models.ID) {
+func (m *PetMutation) SetOwningUserID(value models.ID) {
 	m.owningUser = &value
 }
 
 // OwningUserID returns the value of the "owningUserID" field in the mutation.
-func (m *PetMutation) OwningUserID() (r *models.ID, exists bool) {
+func (m *PetMutation) OwningUserID() (r models.ID, exists bool) {
 	v := m.owningUser
 	if v == nil {
 		return
@@ -409,7 +409,7 @@ func (m *PetMutation) OldField(ctx context.Context, name string) (ent.Value, err
 func (m *PetMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case pet.FieldOwnerID:
-		v, ok := value.(*models.ID)
+		v, ok := value.(models.ID)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -423,7 +423,7 @@ func (m *PetMutation) SetField(name string, value ent.Value) error {
 		m.SetOwnerType(v)
 		return nil
 	case pet.FieldOwningUserID:
-		v, ok := value.(*models.ID)
+		v, ok := value.(models.ID)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

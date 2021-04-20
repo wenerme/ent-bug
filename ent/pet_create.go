@@ -22,8 +22,16 @@ type PetCreate struct {
 }
 
 // SetOwnerID sets the "ownerID" field.
-func (pc *PetCreate) SetOwnerID(m *models.ID) *PetCreate {
+func (pc *PetCreate) SetOwnerID(m models.ID) *PetCreate {
 	pc.mutation.SetOwnerID(m)
+	return pc
+}
+
+// SetNillableOwnerID sets the "ownerID" field if the given value is not nil.
+func (pc *PetCreate) SetNillableOwnerID(m *models.ID) *PetCreate {
+	if m != nil {
+		pc.SetOwnerID(*m)
+	}
 	return pc
 }
 
@@ -42,8 +50,16 @@ func (pc *PetCreate) SetNillableOwnerType(s *string) *PetCreate {
 }
 
 // SetOwningUserID sets the "owningUserID" field.
-func (pc *PetCreate) SetOwningUserID(m *models.ID) *PetCreate {
+func (pc *PetCreate) SetOwningUserID(m models.ID) *PetCreate {
 	pc.mutation.SetOwningUserID(m)
+	return pc
+}
+
+// SetNillableOwningUserID sets the "owningUserID" field if the given value is not nil.
+func (pc *PetCreate) SetNillableOwningUserID(m *models.ID) *PetCreate {
+	if m != nil {
+		pc.SetOwningUserID(*m)
+	}
 	return pc
 }
 
@@ -153,7 +169,7 @@ func (pc *PetCreate) createSpec() (*Pet, *sqlgraph.CreateSpec) {
 			Value:  value,
 			Column: pet.FieldOwnerID,
 		})
-		_node.OwnerID = value
+		_node.OwnerID = &value
 	}
 	if value, ok := pc.mutation.OwnerType(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -188,7 +204,7 @@ func (pc *PetCreate) createSpec() (*Pet, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.OwningUserID = nodes[0]
+		_node.OwningUserID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

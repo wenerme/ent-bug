@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-var idPtrType = new(models.ID)
+var idPtrType = models.ID("")
 var idType = models.ID("")
 
 type IDMixin struct {
