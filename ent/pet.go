@@ -16,7 +16,7 @@ import (
 type Pet struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID *models.ID `json:"id,omitempty"`
+	ID models.ID `json:"id,omitempty"`
 	// OwnerID holds the value of the "ownerID" field.
 	OwnerID *models.ID `json:"ownerID,omitempty"`
 	// OwnerType holds the value of the "ownerType" field.
@@ -83,7 +83,7 @@ func (pe *Pet) assignValues(columns []string, values []interface{}) error {
 			if value, ok := values[i].(*models.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				pe.ID = value
+				pe.ID = *value
 			}
 		case pet.FieldOwnerID:
 			if value, ok := values[i].(*sql.NullScanner); !ok {

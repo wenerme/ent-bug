@@ -15,7 +15,7 @@ import (
 type User struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID *models.ID `json:"id,omitempty"`
+	ID models.ID `json:"id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 }
@@ -48,7 +48,7 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 			if value, ok := values[i].(*models.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				u.ID = value
+				u.ID = *value
 			}
 		case user.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {

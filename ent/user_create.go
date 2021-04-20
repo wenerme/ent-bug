@@ -27,7 +27,7 @@ func (uc *UserCreate) SetName(s string) *UserCreate {
 }
 
 // SetID sets the "id" field.
-func (uc *UserCreate) SetID(m *models.ID) *UserCreate {
+func (uc *UserCreate) SetID(m models.ID) *UserCreate {
 	uc.mutation.SetID(m)
 	return uc
 }

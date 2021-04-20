@@ -54,7 +54,7 @@ func (pc *PetCreate) SetName(s string) *PetCreate {
 }
 
 // SetID sets the "id" field.
-func (pc *PetCreate) SetID(m *models.ID) *PetCreate {
+func (pc *PetCreate) SetID(m models.ID) *PetCreate {
 	pc.mutation.SetID(m)
 	return pc
 }

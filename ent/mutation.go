@@ -33,12 +33,12 @@ type PetMutation struct {
 	config
 	op                Op
 	typ               string
-	id                **models.ID
+	id                *models.ID
 	ownerID           **models.ID
 	ownerType         *string
 	name              *string
 	clearedFields     map[string]struct{}
-	owningUser        **models.ID
+	owningUser        *models.ID
 	clearedowningUser bool
 	done              bool
 	oldValue          func(context.Context) (*Pet, error)
@@ -65,7 +65,7 @@ func newPetMutation(c config, op Op, opts ...petOption) *PetMutation {
 }
 
 // withPetID sets the ID field of the mutation.
-func withPetID(id *models.ID) petOption {
+func withPetID(id models.ID) petOption {
 	return func(m *PetMutation) {
 		var (
 			err   error
@@ -117,13 +117,13 @@ func (m PetMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of Pet entities.
-func (m *PetMutation) SetID(id *models.ID) {
+func (m *PetMutation) SetID(id models.ID) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID
 // is only available if it was provided to the builder.
-func (m *PetMutation) ID() (id *models.ID, exists bool) {
+func (m *PetMutation) ID() (id models.ID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -326,7 +326,7 @@ func (m *PetMutation) OwningUserCleared() bool {
 // OwningUserIDs returns the "owningUser" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // OwningUserID instead. It exists only for internal usage by the builders.
-func (m *PetMutation) OwningUserIDs() (ids []*models.ID) {
+func (m *PetMutation) OwningUserIDs() (ids []models.ID) {
 	if id := m.owningUser; id != nil {
 		ids = append(ids, *id)
 	}
@@ -603,7 +603,7 @@ type UserMutation struct {
 	config
 	op            Op
 	typ           string
-	id            **models.ID
+	id            *models.ID
 	name          *string
 	clearedFields map[string]struct{}
 	done          bool
@@ -631,7 +631,7 @@ func newUserMutation(c config, op Op, opts ...userOption) *UserMutation {
 }
 
 // withUserID sets the ID field of the mutation.
-func withUserID(id *models.ID) userOption {
+func withUserID(id models.ID) userOption {
 	return func(m *UserMutation) {
 		var (
 			err   error
@@ -683,13 +683,13 @@ func (m UserMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of User entities.
-func (m *UserMutation) SetID(id *models.ID) {
+func (m *UserMutation) SetID(id models.ID) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID
 // is only available if it was provided to the builder.
-func (m *UserMutation) ID() (id *models.ID, exists bool) {
+func (m *UserMutation) ID() (id models.ID, exists bool) {
 	if m.id == nil {
 		return
 	}

@@ -17,7 +17,7 @@ type IDMixin struct {
 
 func (IDMixin) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id").GoType(idType).Unique().Immutable().Annotations(),
+		field.String("id").GoType(models.ID("")).Unique().Immutable().Annotations(),
 	}
 }
 func (IDMixin) Hooks() []ent.Hook {
