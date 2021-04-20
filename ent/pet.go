@@ -10,6 +10,7 @@ import (
 	"github.com/wenerme/ent-demo/ent/pet"
 	"github.com/wenerme/ent-demo/ent/user"
 	"github.com/wenerme/ent-demo/models"
+	"github.com/xtgo/uuid"
 )
 
 // Pet is the model entity for the Pet schema.
@@ -17,6 +18,8 @@ type Pet struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID models.ID `json:"id,omitempty"`
+	// UID holds the value of the "uid" field.
+	UID *uuid.UUID `json:"uid,omitempty"`
 	// OwnerID holds the value of the "ownerID" field.
 	OwnerID *models.ID `json:"ownerID,omitempty"`
 	// OwnerType holds the value of the "ownerType" field.
@@ -60,6 +63,8 @@ func (*Pet) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case pet.FieldOwnerID, pet.FieldOwningUserID:
 			values[i] = &sql.NullScanner{S: new(models.ID)}
+		case pet.FieldUID:
+			values[i] = new(*uuid.UUID)
 		case pet.FieldID:
 			values[i] = new(models.ID)
 		case pet.FieldOwnerType, pet.FieldName:
@@ -84,6 +89,12 @@ func (pe *Pet) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
 				pe.ID = *value
+			}
+		case pet.FieldUID:
+			if value, ok := values[i].(**uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field uid", values[i])
+			} else if value != nil {
+				pe.UID = *value
 			}
 		case pet.FieldOwnerID:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
@@ -145,6 +156,8 @@ func (pe *Pet) String() string {
 	var builder strings.Builder
 	builder.WriteString("Pet(")
 	builder.WriteString(fmt.Sprintf("id=%v", pe.ID))
+	builder.WriteString(", uid=")
+	builder.WriteString(fmt.Sprintf("%v", pe.UID))
 	if v := pe.OwnerID; v != nil {
 		builder.WriteString(", ownerID=")
 		builder.WriteString(fmt.Sprintf("%v", *v))

@@ -291,12 +291,12 @@ func (pq *PetQuery) WithOwningUser(opts ...func(*UserQuery)) *PetQuery {
 // Example:
 //
 //	var v []struct {
-//		OwnerID models.ID `json:"ownerID,omitempty"`
+//		UID *uuid.UUID `json:"uid,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Pet.Query().
-//		GroupBy(pet.FieldOwnerID).
+//		GroupBy(pet.FieldUID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -318,11 +318,11 @@ func (pq *PetQuery) GroupBy(field string, fields ...string) *PetGroupBy {
 // Example:
 //
 //	var v []struct {
-//		OwnerID models.ID `json:"ownerID,omitempty"`
+//		UID *uuid.UUID `json:"uid,omitempty"`
 //	}
 //
 //	client.Pet.Query().
-//		Select(pet.FieldOwnerID).
+//		Select(pet.FieldUID).
 //		Scan(ctx, &v)
 //
 func (pq *PetQuery) Select(field string, fields ...string) *PetSelect {

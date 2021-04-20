@@ -13,6 +13,7 @@ import (
 	"github.com/wenerme/ent-demo/ent/predicate"
 	"github.com/wenerme/ent-demo/ent/user"
 	"github.com/wenerme/ent-demo/models"
+	"github.com/xtgo/uuid"
 )
 
 // PetUpdate is the builder for updating Pet entities.
@@ -25,6 +26,18 @@ type PetUpdate struct {
 // Where adds a new predicate for the PetUpdate builder.
 func (pu *PetUpdate) Where(ps ...predicate.Pet) *PetUpdate {
 	pu.mutation.predicates = append(pu.mutation.predicates, ps...)
+	return pu
+}
+
+// SetUID sets the "uid" field.
+func (pu *PetUpdate) SetUID(u *uuid.UUID) *PetUpdate {
+	pu.mutation.SetUID(u)
+	return pu
+}
+
+// ClearUID clears the value of the "uid" field.
+func (pu *PetUpdate) ClearUID() *PetUpdate {
+	pu.mutation.ClearUID()
 	return pu
 }
 
@@ -179,6 +192,19 @@ func (pu *PetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := pu.mutation.UID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: pet.FieldUID,
+		})
+	}
+	if pu.mutation.UIDCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Column: pet.FieldUID,
+		})
+	}
 	if value, ok := pu.mutation.OwnerID(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -264,6 +290,18 @@ type PetUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *PetMutation
+}
+
+// SetUID sets the "uid" field.
+func (puo *PetUpdateOne) SetUID(u *uuid.UUID) *PetUpdateOne {
+	puo.mutation.SetUID(u)
+	return puo
+}
+
+// ClearUID clears the value of the "uid" field.
+func (puo *PetUpdateOne) ClearUID() *PetUpdateOne {
+	puo.mutation.ClearUID()
+	return puo
 }
 
 // SetOwnerID sets the "ownerID" field.
@@ -440,6 +478,19 @@ func (puo *PetUpdateOne) sqlSave(ctx context.Context) (_node *Pet, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := puo.mutation.UID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: pet.FieldUID,
+		})
+	}
+	if puo.mutation.UIDCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Column: pet.FieldUID,
+		})
 	}
 	if value, ok := puo.mutation.OwnerID(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{

@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/wenerme/ent-demo/ent/predicate"
 	"github.com/wenerme/ent-demo/ent/user"
+	"github.com/xtgo/uuid"
 )
 
 // UserUpdate is the builder for updating User entities.
@@ -23,6 +24,18 @@ type UserUpdate struct {
 // Where adds a new predicate for the UserUpdate builder.
 func (uu *UserUpdate) Where(ps ...predicate.User) *UserUpdate {
 	uu.mutation.predicates = append(uu.mutation.predicates, ps...)
+	return uu
+}
+
+// SetUID sets the "uid" field.
+func (uu *UserUpdate) SetUID(u *uuid.UUID) *UserUpdate {
+	uu.mutation.SetUID(u)
+	return uu
+}
+
+// ClearUID clears the value of the "uid" field.
+func (uu *UserUpdate) ClearUID() *UserUpdate {
+	uu.mutation.ClearUID()
 	return uu
 }
 
@@ -106,6 +119,19 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := uu.mutation.UID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: user.FieldUID,
+		})
+	}
+	if uu.mutation.UIDCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Column: user.FieldUID,
+		})
+	}
 	if value, ok := uu.mutation.Name(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -130,6 +156,18 @@ type UserUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *UserMutation
+}
+
+// SetUID sets the "uid" field.
+func (uuo *UserUpdateOne) SetUID(u *uuid.UUID) *UserUpdateOne {
+	uuo.mutation.SetUID(u)
+	return uuo
+}
+
+// ClearUID clears the value of the "uid" field.
+func (uuo *UserUpdateOne) ClearUID() *UserUpdateOne {
+	uuo.mutation.ClearUID()
+	return uuo
 }
 
 // SetName sets the "name" field.
@@ -235,6 +273,19 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := uuo.mutation.UID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: user.FieldUID,
+		})
+	}
+	if uuo.mutation.UIDCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Column: user.FieldUID,
+		})
 	}
 	if value, ok := uuo.mutation.Name(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{

@@ -12,6 +12,7 @@ import (
 	"github.com/wenerme/ent-demo/ent/pet"
 	"github.com/wenerme/ent-demo/ent/user"
 	"github.com/wenerme/ent-demo/models"
+	"github.com/xtgo/uuid"
 )
 
 // PetCreate is the builder for creating a Pet entity.
@@ -19,6 +20,12 @@ type PetCreate struct {
 	config
 	mutation *PetMutation
 	hooks    []Hook
+}
+
+// SetUID sets the "uid" field.
+func (pc *PetCreate) SetUID(u *uuid.UUID) *PetCreate {
+	pc.mutation.SetUID(u)
+	return pc
 }
 
 // SetOwnerID sets the "ownerID" field.
@@ -91,6 +98,7 @@ func (pc *PetCreate) Save(ctx context.Context) (*Pet, error) {
 		err  error
 		node *Pet
 	)
+	pc.defaults()
 	if len(pc.hooks) == 0 {
 		if err = pc.check(); err != nil {
 			return nil, err
@@ -129,6 +137,14 @@ func (pc *PetCreate) SaveX(ctx context.Context) *Pet {
 	return v
 }
 
+// defaults sets the default values of the builder before save.
+func (pc *PetCreate) defaults() {
+	if _, ok := pc.mutation.UID(); !ok {
+		v := pet.DefaultUID()
+		pc.mutation.SetUID(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (pc *PetCreate) check() error {
 	if _, ok := pc.mutation.Name(); !ok {
@@ -162,6 +178,14 @@ func (pc *PetCreate) createSpec() (*Pet, *sqlgraph.CreateSpec) {
 	if id, ok := pc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
+	}
+	if value, ok := pc.mutation.UID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: pet.FieldUID,
+		})
+		_node.UID = value
 	}
 	if value, ok := pc.mutation.OwnerID(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -224,6 +248,7 @@ func (pcb *PetCreateBulk) Save(ctx context.Context) ([]*Pet, error) {
 	for i := range pcb.builders {
 		func(i int, root context.Context) {
 			builder := pcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*PetMutation)
 				if !ok {

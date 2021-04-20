@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/wenerme/ent-demo/ent/user"
 	"github.com/wenerme/ent-demo/models"
+	"github.com/xtgo/uuid"
 )
 
 // User is the model entity for the User schema.
@@ -16,6 +17,8 @@ type User struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID models.ID `json:"id,omitempty"`
+	// UID holds the value of the "uid" field.
+	UID *uuid.UUID `json:"uid,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 }
@@ -25,6 +28,8 @@ func (*User) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case user.FieldUID:
+			values[i] = new(*uuid.UUID)
 		case user.FieldID:
 			values[i] = new(models.ID)
 		case user.FieldName:
@@ -49,6 +54,12 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
 				u.ID = *value
+			}
+		case user.FieldUID:
+			if value, ok := values[i].(**uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field uid", values[i])
+			} else if value != nil {
+				u.UID = *value
 			}
 		case user.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -84,6 +95,8 @@ func (u *User) String() string {
 	var builder strings.Builder
 	builder.WriteString("User(")
 	builder.WriteString(fmt.Sprintf("id=%v", u.ID))
+	builder.WriteString(", uid=")
+	builder.WriteString(fmt.Sprintf("%v", u.UID))
 	builder.WriteString(", name=")
 	builder.WriteString(u.Name)
 	builder.WriteByte(')')

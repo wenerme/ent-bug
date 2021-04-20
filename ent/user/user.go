@@ -4,6 +4,7 @@ package user
 
 import (
 	"entgo.io/ent"
+	"github.com/xtgo/uuid"
 )
 
 const (
@@ -11,6 +12,8 @@ const (
 	Label = "user"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldUID holds the string denoting the uid field in the database.
+	FieldUID = "uid"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// Table holds the table name of the user in the database.
@@ -20,6 +23,7 @@ const (
 // Columns holds all SQL columns for user fields.
 var Columns = []string{
 	FieldID,
+	FieldUID,
 	FieldName,
 }
 
@@ -41,4 +45,6 @@ func ValidColumn(column string) bool {
 //
 var (
 	Hooks [1]ent.Hook
+	// DefaultUID holds the default value on creation for the "uid" field.
+	DefaultUID func() *uuid.UUID
 )

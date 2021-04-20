@@ -4,6 +4,7 @@ package pet
 
 import (
 	"entgo.io/ent"
+	"github.com/xtgo/uuid"
 )
 
 const (
@@ -11,6 +12,8 @@ const (
 	Label = "pet"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldUID holds the string denoting the uid field in the database.
+	FieldUID = "uid"
 	// FieldOwnerID holds the string denoting the ownerid field in the database.
 	FieldOwnerID = "owner_id"
 	// FieldOwnerType holds the string denoting the ownertype field in the database.
@@ -35,6 +38,7 @@ const (
 // Columns holds all SQL columns for pet fields.
 var Columns = []string{
 	FieldID,
+	FieldUID,
 	FieldOwnerID,
 	FieldOwnerType,
 	FieldOwningUserID,
@@ -59,4 +63,6 @@ func ValidColumn(column string) bool {
 //
 var (
 	Hooks [1]ent.Hook
+	// DefaultUID holds the default value on creation for the "uid" field.
+	DefaultUID func() *uuid.UUID
 )

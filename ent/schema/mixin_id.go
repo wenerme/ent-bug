@@ -3,6 +3,7 @@ package schema
 import (
 	"context"
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/mixin"
 	"github.com/google/uuid"
@@ -19,6 +20,10 @@ type IDMixin struct {
 func (IDMixin) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("id").GoType(idType).Unique().Immutable().Annotations(),
+		field.UUID("uid", new(uuid.UUID)).Default(func() *uuid.UUID {
+			u := uuid.New()
+			return &u
+		}).Optional().Annotations(entsql.Annotation{}),
 	}
 }
 func (IDMixin) Hooks() []ent.Hook {
