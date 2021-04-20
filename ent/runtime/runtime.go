@@ -2,9 +2,25 @@
 
 package runtime
 
-// The schema-stitching logic is generated in github.com/wenerme/ent-demo/ent/runtime.go
+import (
+	"github.com/wenerme/ent-demo/ent/pet"
+	"github.com/wenerme/ent-demo/ent/schema"
+	"github.com/wenerme/ent-demo/ent/user"
+)
+
+// The init function reads all schema descriptors with runtime code
+// (default values, validators, hooks and policies) and stitches it
+// to their package variables.
+func init() {
+	petMixin := schema.Pet{}.Mixin()
+	petMixinHooks0 := petMixin[0].Hooks()
+	pet.Hooks[0] = petMixinHooks0[0]
+	userMixin := schema.User{}.Mixin()
+	userMixinHooks0 := userMixin[0].Hooks()
+	user.Hooks[0] = userMixinHooks0[0]
+}
 
 const (
-	Version = "v0.7.0"                                          // Version of ent codegen.
-	Sum     = "h1:E3EjO0cUL61DvUg5ZEZdxa4yTL+4SuZv0LqBExo8CQA=" // Sum of ent codegen.
+	Version = "v0.8.1-0.20210419154037-b3041725d2c7"            // Version of ent codegen.
+	Sum     = "h1:MBz4FM7L9+hyXkOEnJBHsiJUNrtH2bOAc68XlHZThc4=" // Sum of ent codegen.
 )

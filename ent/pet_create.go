@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/wenerme/ent-demo/ent/pet"
 	"github.com/wenerme/ent-demo/ent/user"
+	"github.com/wenerme/ent-demo/models"
 )
 
 // PetCreate is the builder for creating a Pet entity.
@@ -21,16 +22,8 @@ type PetCreate struct {
 }
 
 // SetOwnerID sets the "ownerID" field.
-func (pc *PetCreate) SetOwnerID(s string) *PetCreate {
-	pc.mutation.SetOwnerID(s)
-	return pc
-}
-
-// SetNillableOwnerID sets the "ownerID" field if the given value is not nil.
-func (pc *PetCreate) SetNillableOwnerID(s *string) *PetCreate {
-	if s != nil {
-		pc.SetOwnerID(*s)
-	}
+func (pc *PetCreate) SetOwnerID(m *models.ID) *PetCreate {
+	pc.mutation.SetOwnerID(m)
 	return pc
 }
 
@@ -49,22 +42,20 @@ func (pc *PetCreate) SetNillableOwnerType(s *string) *PetCreate {
 }
 
 // SetOwningUserID sets the "owningUserID" field.
-func (pc *PetCreate) SetOwningUserID(i int) *PetCreate {
-	pc.mutation.SetOwningUserID(i)
-	return pc
-}
-
-// SetNillableOwningUserID sets the "owningUserID" field if the given value is not nil.
-func (pc *PetCreate) SetNillableOwningUserID(i *int) *PetCreate {
-	if i != nil {
-		pc.SetOwningUserID(*i)
-	}
+func (pc *PetCreate) SetOwningUserID(m *models.ID) *PetCreate {
+	pc.mutation.SetOwningUserID(m)
 	return pc
 }
 
 // SetName sets the "name" field.
 func (pc *PetCreate) SetName(s string) *PetCreate {
 	pc.mutation.SetName(s)
+	return pc
+}
+
+// SetID sets the "id" field.
+func (pc *PetCreate) SetID(m *models.ID) *PetCreate {
+	pc.mutation.SetID(m)
 	return pc
 }
 
@@ -138,8 +129,6 @@ func (pc *PetCreate) sqlSave(ctx context.Context) (*Pet, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
 	return _node, nil
 }
 
@@ -149,18 +138,22 @@ func (pc *PetCreate) createSpec() (*Pet, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: pet.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeString,
 				Column: pet.FieldID,
 			},
 		}
 	)
+	if id, ok := pc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := pc.mutation.OwnerID(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
 			Column: pet.FieldOwnerID,
 		})
-		_node.OwnerID = &value
+		_node.OwnerID = value
 	}
 	if value, ok := pc.mutation.OwnerType(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -187,7 +180,7 @@ func (pc *PetCreate) createSpec() (*Pet, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: user.FieldID,
 				},
 			},
@@ -195,7 +188,7 @@ func (pc *PetCreate) createSpec() (*Pet, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.OwningUserID = &nodes[0]
+		_node.OwningUserID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -240,8 +233,6 @@ func (pcb *PetCreateBulk) Save(ctx context.Context) ([]*Pet, error) {
 				if err != nil {
 					return nil, err
 				}
-				id := specs[i].ID.Value.(int64)
-				nodes[i].ID = int(id)
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

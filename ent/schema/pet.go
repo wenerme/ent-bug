@@ -17,6 +17,7 @@ func (Pet) Fields() []ent.Field {
 
 func (Pet) Mixin() []ent.Mixin {
 	return []ent.Mixin{
+		IDMixin{},
 		HasOwnerMixin{},
 	}
 }

@@ -9,19 +9,20 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/wenerme/ent-demo/ent/pet"
 	"github.com/wenerme/ent-demo/ent/user"
+	"github.com/wenerme/ent-demo/models"
 )
 
 // Pet is the model entity for the Pet schema.
 type Pet struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID *models.ID `json:"id,omitempty"`
 	// OwnerID holds the value of the "ownerID" field.
-	OwnerID *string `json:"ownerID,omitempty"`
+	OwnerID *models.ID `json:"ownerID,omitempty"`
 	// OwnerType holds the value of the "ownerType" field.
 	OwnerType *string `json:"ownerType,omitempty"`
 	// OwningUserID holds the value of the "owningUserID" field.
-	OwningUserID *int `json:"owningUserID,omitempty"`
+	OwningUserID *models.ID `json:"owningUserID,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -57,10 +58,12 @@ func (*Pet) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case pet.FieldID, pet.FieldOwningUserID:
-			values[i] = &sql.NullInt64{}
-		case pet.FieldOwnerID, pet.FieldOwnerType, pet.FieldName:
-			values[i] = &sql.NullString{}
+		case pet.FieldOwnerID, pet.FieldOwningUserID:
+			values[i] = &sql.NullScanner{S: new(models.ID)}
+		case pet.FieldID:
+			values[i] = new(models.ID)
+		case pet.FieldOwnerType, pet.FieldName:
+			values[i] = new(sql.NullString)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Pet", columns[i])
 		}
@@ -77,17 +80,16 @@ func (pe *Pet) assignValues(columns []string, values []interface{}) error {
 	for i := range columns {
 		switch columns[i] {
 		case pet.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*models.ID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value != nil {
+				pe.ID = value
 			}
-			pe.ID = int(value.Int64)
 		case pet.FieldOwnerID:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field ownerID", values[i])
 			} else if value.Valid {
-				pe.OwnerID = new(string)
-				*pe.OwnerID = value.String
+				pe.OwnerID = value.S.(*models.ID)
 			}
 		case pet.FieldOwnerType:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -97,11 +99,10 @@ func (pe *Pet) assignValues(columns []string, values []interface{}) error {
 				*pe.OwnerType = value.String
 			}
 		case pet.FieldOwningUserID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field owningUserID", values[i])
 			} else if value.Valid {
-				pe.OwningUserID = new(int)
-				*pe.OwningUserID = int(value.Int64)
+				pe.OwningUserID = value.S.(*models.ID)
 			}
 		case pet.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -144,7 +145,7 @@ func (pe *Pet) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v", pe.ID))
 	if v := pe.OwnerID; v != nil {
 		builder.WriteString(", ownerID=")
-		builder.WriteString(*v)
+		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	if v := pe.OwnerType; v != nil {
 		builder.WriteString(", ownerType=")

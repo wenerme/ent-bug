@@ -12,6 +12,7 @@ import (
 	"github.com/wenerme/ent-demo/ent/pet"
 	"github.com/wenerme/ent-demo/ent/predicate"
 	"github.com/wenerme/ent-demo/ent/user"
+	"github.com/wenerme/ent-demo/models"
 )
 
 // PetUpdate is the builder for updating Pet entities.
@@ -28,16 +29,8 @@ func (pu *PetUpdate) Where(ps ...predicate.Pet) *PetUpdate {
 }
 
 // SetOwnerID sets the "ownerID" field.
-func (pu *PetUpdate) SetOwnerID(s string) *PetUpdate {
-	pu.mutation.SetOwnerID(s)
-	return pu
-}
-
-// SetNillableOwnerID sets the "ownerID" field if the given value is not nil.
-func (pu *PetUpdate) SetNillableOwnerID(s *string) *PetUpdate {
-	if s != nil {
-		pu.SetOwnerID(*s)
-	}
+func (pu *PetUpdate) SetOwnerID(m *models.ID) *PetUpdate {
+	pu.mutation.SetOwnerID(m)
 	return pu
 }
 
@@ -68,17 +61,8 @@ func (pu *PetUpdate) ClearOwnerType() *PetUpdate {
 }
 
 // SetOwningUserID sets the "owningUserID" field.
-func (pu *PetUpdate) SetOwningUserID(i int) *PetUpdate {
-	pu.mutation.ResetOwningUserID()
-	pu.mutation.SetOwningUserID(i)
-	return pu
-}
-
-// SetNillableOwningUserID sets the "owningUserID" field if the given value is not nil.
-func (pu *PetUpdate) SetNillableOwningUserID(i *int) *PetUpdate {
-	if i != nil {
-		pu.SetOwningUserID(*i)
-	}
+func (pu *PetUpdate) SetOwningUserID(m *models.ID) *PetUpdate {
+	pu.mutation.SetOwningUserID(m)
 	return pu
 }
 
@@ -167,7 +151,7 @@ func (pu *PetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   pet.Table,
 			Columns: pet.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeString,
 				Column: pet.FieldID,
 			},
 		},
@@ -221,7 +205,7 @@ func (pu *PetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: user.FieldID,
 				},
 			},
@@ -237,7 +221,7 @@ func (pu *PetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: user.FieldID,
 				},
 			},
@@ -261,21 +245,14 @@ func (pu *PetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 // PetUpdateOne is the builder for updating a single Pet entity.
 type PetUpdateOne struct {
 	config
+	fields   []string
 	hooks    []Hook
 	mutation *PetMutation
 }
 
 // SetOwnerID sets the "ownerID" field.
-func (puo *PetUpdateOne) SetOwnerID(s string) *PetUpdateOne {
-	puo.mutation.SetOwnerID(s)
-	return puo
-}
-
-// SetNillableOwnerID sets the "ownerID" field if the given value is not nil.
-func (puo *PetUpdateOne) SetNillableOwnerID(s *string) *PetUpdateOne {
-	if s != nil {
-		puo.SetOwnerID(*s)
-	}
+func (puo *PetUpdateOne) SetOwnerID(m *models.ID) *PetUpdateOne {
+	puo.mutation.SetOwnerID(m)
 	return puo
 }
 
@@ -306,17 +283,8 @@ func (puo *PetUpdateOne) ClearOwnerType() *PetUpdateOne {
 }
 
 // SetOwningUserID sets the "owningUserID" field.
-func (puo *PetUpdateOne) SetOwningUserID(i int) *PetUpdateOne {
-	puo.mutation.ResetOwningUserID()
-	puo.mutation.SetOwningUserID(i)
-	return puo
-}
-
-// SetNillableOwningUserID sets the "owningUserID" field if the given value is not nil.
-func (puo *PetUpdateOne) SetNillableOwningUserID(i *int) *PetUpdateOne {
-	if i != nil {
-		puo.SetOwningUserID(*i)
-	}
+func (puo *PetUpdateOne) SetOwningUserID(m *models.ID) *PetUpdateOne {
+	puo.mutation.SetOwningUserID(m)
 	return puo
 }
 
@@ -345,6 +313,13 @@ func (puo *PetUpdateOne) Mutation() *PetMutation {
 // ClearOwningUser clears the "owningUser" edge to the User entity.
 func (puo *PetUpdateOne) ClearOwningUser() *PetUpdateOne {
 	puo.mutation.ClearOwningUser()
+	return puo
+}
+
+// Select allows selecting one or more fields (columns) of the returned entity.
+// The default is selecting all fields defined in the entity schema.
+func (puo *PetUpdateOne) Select(field string, fields ...string) *PetUpdateOne {
+	puo.fields = append([]string{field}, fields...)
 	return puo
 }
 
@@ -405,7 +380,7 @@ func (puo *PetUpdateOne) sqlSave(ctx context.Context) (_node *Pet, err error) {
 			Table:   pet.Table,
 			Columns: pet.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeString,
 				Column: pet.FieldID,
 			},
 		},
@@ -415,6 +390,18 @@ func (puo *PetUpdateOne) sqlSave(ctx context.Context) (_node *Pet, err error) {
 		return nil, &ValidationError{Name: "ID", err: fmt.Errorf("missing Pet.ID for update")}
 	}
 	_spec.Node.ID.Value = id
+	if fields := puo.fields; len(fields) > 0 {
+		_spec.Node.Columns = make([]string, 0, len(fields))
+		_spec.Node.Columns = append(_spec.Node.Columns, pet.FieldID)
+		for _, f := range fields {
+			if !pet.ValidColumn(f) {
+				return nil, &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
+			}
+			if f != pet.FieldID {
+				_spec.Node.Columns = append(_spec.Node.Columns, f)
+			}
+		}
+	}
 	if ps := puo.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -464,7 +451,7 @@ func (puo *PetUpdateOne) sqlSave(ctx context.Context) (_node *Pet, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: user.FieldID,
 				},
 			},
@@ -480,7 +467,7 @@ func (puo *PetUpdateOne) sqlSave(ctx context.Context) (_node *Pet, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: user.FieldID,
 				},
 			},

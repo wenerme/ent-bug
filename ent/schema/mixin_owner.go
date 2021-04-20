@@ -14,9 +14,9 @@ type HasOwnerMixin struct {
 
 func (HasOwnerMixin) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("ownerID").Optional().Nillable(),
+		field.String("ownerID").GoType(idType).Optional().Nillable(),
 		field.String("ownerType").Optional().Nillable(),
-		field.Int("owningUserID").Optional().Nillable(),
+		field.String("owningUserID").GoType(idType).Optional().Nillable(),
 	}
 }
 func (HasOwnerMixin) Indexes() []ent.Index {

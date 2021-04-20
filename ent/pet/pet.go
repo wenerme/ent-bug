@@ -2,6 +2,10 @@
 
 package pet
 
+import (
+	"entgo.io/ent"
+)
+
 const (
 	// Label holds the string label denoting the pet type in the database.
 	Label = "pet"
@@ -46,3 +50,13 @@ func ValidColumn(column string) bool {
 	}
 	return false
 }
+
+// Note that the variables below are initialized by the runtime
+// package on the initialization of the application. Therefore,
+// it should be imported in the main as follows:
+//
+//	import _ "github.com/wenerme/ent-demo/ent/runtime"
+//
+var (
+	Hooks [1]ent.Hook
+)

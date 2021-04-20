@@ -14,6 +14,7 @@ import (
 	"github.com/wenerme/ent-demo/ent/pet"
 	"github.com/wenerme/ent-demo/ent/predicate"
 	"github.com/wenerme/ent-demo/ent/user"
+	"github.com/wenerme/ent-demo/models"
 )
 
 // PetQuery is the builder for querying Pet entities.
@@ -21,6 +22,7 @@ type PetQuery struct {
 	config
 	limit      *int
 	offset     *int
+	unique     *bool
 	order      []OrderFunc
 	fields     []string
 	predicates []predicate.Pet
@@ -46,6 +48,13 @@ func (pq *PetQuery) Limit(limit int) *PetQuery {
 // Offset adds an offset step to the query.
 func (pq *PetQuery) Offset(offset int) *PetQuery {
 	pq.offset = &offset
+	return pq
+}
+
+// Unique configures the query builder to filter duplicate records on query.
+// By default, unique is set to true, and can be disabled using this method.
+func (pq *PetQuery) Unique(unique bool) *PetQuery {
+	pq.unique = &unique
 	return pq
 }
 
@@ -101,8 +110,8 @@ func (pq *PetQuery) FirstX(ctx context.Context) *Pet {
 
 // FirstID returns the first Pet ID from the query.
 // Returns a *NotFoundError when no Pet ID was found.
-func (pq *PetQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (pq *PetQuery) FirstID(ctx context.Context) (id *models.ID, err error) {
+	var ids []*models.ID
 	if ids, err = pq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -114,7 +123,7 @@ func (pq *PetQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (pq *PetQuery) FirstIDX(ctx context.Context) int {
+func (pq *PetQuery) FirstIDX(ctx context.Context) *models.ID {
 	id, err := pq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -152,8 +161,8 @@ func (pq *PetQuery) OnlyX(ctx context.Context) *Pet {
 // OnlyID is like Only, but returns the only Pet ID in the query.
 // Returns a *NotSingularError when exactly one Pet ID is not found.
 // Returns a *NotFoundError when no entities are found.
-func (pq *PetQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (pq *PetQuery) OnlyID(ctx context.Context) (id *models.ID, err error) {
+	var ids []*models.ID
 	if ids, err = pq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -169,7 +178,7 @@ func (pq *PetQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (pq *PetQuery) OnlyIDX(ctx context.Context) int {
+func (pq *PetQuery) OnlyIDX(ctx context.Context) *models.ID {
 	id, err := pq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -195,8 +204,8 @@ func (pq *PetQuery) AllX(ctx context.Context) []*Pet {
 }
 
 // IDs executes the query and returns a list of Pet IDs.
-func (pq *PetQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (pq *PetQuery) IDs(ctx context.Context) ([]*models.ID, error) {
+	var ids []*models.ID
 	if err := pq.Select(pet.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -204,7 +213,7 @@ func (pq *PetQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (pq *PetQuery) IDsX(ctx context.Context) []int {
+func (pq *PetQuery) IDsX(ctx context.Context) []*models.ID {
 	ids, err := pq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -282,7 +291,7 @@ func (pq *PetQuery) WithOwningUser(opts ...func(*UserQuery)) *PetQuery {
 // Example:
 //
 //	var v []struct {
-//		OwnerID string `json:"ownerID,omitempty"`
+//		OwnerID *models.ID `json:"ownerID,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -309,7 +318,7 @@ func (pq *PetQuery) GroupBy(field string, fields ...string) *PetGroupBy {
 // Example:
 //
 //	var v []struct {
-//		OwnerID string `json:"ownerID,omitempty"`
+//		OwnerID *models.ID `json:"ownerID,omitempty"`
 //	}
 //
 //	client.Pet.Query().
@@ -366,14 +375,17 @@ func (pq *PetQuery) sqlAll(ctx context.Context) ([]*Pet, error) {
 	}
 
 	if query := pq.withOwningUser; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*Pet)
+		ids := make([]*models.ID, 0, len(nodes))
+		nodeids := make(map[*models.ID][]*Pet)
 		for i := range nodes {
-			fk := nodes[i].OwningUserID
-			if fk != nil {
-				ids = append(ids, *fk)
-				nodeids[*fk] = append(nodeids[*fk], nodes[i])
+			if nodes[i].OwningUserID == nil {
+				continue
 			}
+			fk := *nodes[i].OwningUserID
+			if _, ok := nodeids[fk]; !ok {
+				ids = append(ids, fk)
+			}
+			nodeids[fk] = append(nodeids[fk], nodes[i])
 		}
 		query.Where(user.IDIn(ids...))
 		neighbors, err := query.All(ctx)
@@ -413,12 +425,15 @@ func (pq *PetQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   pet.Table,
 			Columns: pet.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeString,
 				Column: pet.FieldID,
 			},
 		},
 		From:   pq.sql,
 		Unique: true,
+	}
+	if unique := pq.unique; unique != nil {
+		_spec.Unique = *unique
 	}
 	if fields := pq.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
@@ -445,7 +460,7 @@ func (pq *PetQuery) querySpec() *sqlgraph.QuerySpec {
 	if ps := pq.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
-				ps[i](selector, pet.ValidColumn)
+				ps[i](selector)
 			}
 		}
 	}
@@ -464,7 +479,7 @@ func (pq *PetQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		p(selector)
 	}
 	for _, p := range pq.order {
-		p(selector, pet.ValidColumn)
+		p(selector)
 	}
 	if offset := pq.offset; offset != nil {
 		// limit is mandatory for offset clause. We start
@@ -726,13 +741,24 @@ func (pgb *PetGroupBy) sqlScan(ctx context.Context, v interface{}) error {
 }
 
 func (pgb *PetGroupBy) sqlQuery() *sql.Selector {
-	selector := pgb.sql
-	columns := make([]string, 0, len(pgb.fields)+len(pgb.fns))
-	columns = append(columns, pgb.fields...)
+	selector := pgb.sql.Select()
+	aggregation := make([]string, 0, len(pgb.fns))
 	for _, fn := range pgb.fns {
-		columns = append(columns, fn(selector, pet.ValidColumn))
+		aggregation = append(aggregation, fn(selector))
 	}
-	return selector.Select(columns...).GroupBy(pgb.fields...)
+	// If no columns were selected in a custom aggregation function, the default
+	// selection is the fields used for "group-by", and the aggregation functions.
+	if len(selector.SelectedColumns()) == 0 {
+		columns := make([]string, 0, len(pgb.fields)+len(pgb.fns))
+		for _, f := range pgb.fields {
+			columns = append(columns, selector.C(f))
+		}
+		for _, c := range aggregation {
+			columns = append(columns, c)
+		}
+		selector.Select(columns...)
+	}
+	return selector.GroupBy(selector.Columns(pgb.fields...)...)
 }
 
 // PetSelect is the builder for selecting fields of Pet entities.

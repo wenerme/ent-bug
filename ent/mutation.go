@@ -10,6 +10,7 @@ import (
 	"github.com/wenerme/ent-demo/ent/pet"
 	"github.com/wenerme/ent-demo/ent/predicate"
 	"github.com/wenerme/ent-demo/ent/user"
+	"github.com/wenerme/ent-demo/models"
 
 	"entgo.io/ent"
 )
@@ -32,12 +33,12 @@ type PetMutation struct {
 	config
 	op                Op
 	typ               string
-	id                *int
-	ownerID           *string
+	id                **models.ID
+	ownerID           **models.ID
 	ownerType         *string
 	name              *string
 	clearedFields     map[string]struct{}
-	owningUser        *int
+	owningUser        **models.ID
 	clearedowningUser bool
 	done              bool
 	oldValue          func(context.Context) (*Pet, error)
@@ -64,7 +65,7 @@ func newPetMutation(c config, op Op, opts ...petOption) *PetMutation {
 }
 
 // withPetID sets the ID field of the mutation.
-func withPetID(id int) petOption {
+func withPetID(id *models.ID) petOption {
 	return func(m *PetMutation) {
 		var (
 			err   error
@@ -114,9 +115,15 @@ func (m PetMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Pet entities.
+func (m *PetMutation) SetID(id *models.ID) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID
 // is only available if it was provided to the builder.
-func (m *PetMutation) ID() (id int, exists bool) {
+func (m *PetMutation) ID() (id *models.ID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -124,12 +131,12 @@ func (m *PetMutation) ID() (id int, exists bool) {
 }
 
 // SetOwnerID sets the "ownerID" field.
-func (m *PetMutation) SetOwnerID(s string) {
-	m.ownerID = &s
+func (m *PetMutation) SetOwnerID(value *models.ID) {
+	m.ownerID = &value
 }
 
 // OwnerID returns the value of the "ownerID" field in the mutation.
-func (m *PetMutation) OwnerID() (r string, exists bool) {
+func (m *PetMutation) OwnerID() (r *models.ID, exists bool) {
 	v := m.ownerID
 	if v == nil {
 		return
@@ -140,7 +147,7 @@ func (m *PetMutation) OwnerID() (r string, exists bool) {
 // OldOwnerID returns the old "ownerID" field's value of the Pet entity.
 // If the Pet object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PetMutation) OldOwnerID(ctx context.Context) (v *string, err error) {
+func (m *PetMutation) OldOwnerID(ctx context.Context) (v *models.ID, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldOwnerID is only allowed on UpdateOne operations")
 	}
@@ -222,12 +229,12 @@ func (m *PetMutation) ResetOwnerType() {
 }
 
 // SetOwningUserID sets the "owningUserID" field.
-func (m *PetMutation) SetOwningUserID(i int) {
-	m.owningUser = &i
+func (m *PetMutation) SetOwningUserID(value *models.ID) {
+	m.owningUser = &value
 }
 
 // OwningUserID returns the value of the "owningUserID" field in the mutation.
-func (m *PetMutation) OwningUserID() (r int, exists bool) {
+func (m *PetMutation) OwningUserID() (r *models.ID, exists bool) {
 	v := m.owningUser
 	if v == nil {
 		return
@@ -238,7 +245,7 @@ func (m *PetMutation) OwningUserID() (r int, exists bool) {
 // OldOwningUserID returns the old "owningUserID" field's value of the Pet entity.
 // If the Pet object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PetMutation) OldOwningUserID(ctx context.Context) (v *int, err error) {
+func (m *PetMutation) OldOwningUserID(ctx context.Context) (v *models.ID, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldOwningUserID is only allowed on UpdateOne operations")
 	}
@@ -311,15 +318,15 @@ func (m *PetMutation) ClearOwningUser() {
 	m.clearedowningUser = true
 }
 
-// OwningUserCleared returns if the "owningUser" edge to the User entity was cleared.
+// OwningUserCleared reports if the "owningUser" edge to the User entity was cleared.
 func (m *PetMutation) OwningUserCleared() bool {
-	return m.clearedowningUser
+	return m.OwningUserIDCleared() || m.clearedowningUser
 }
 
 // OwningUserIDs returns the "owningUser" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // OwningUserID instead. It exists only for internal usage by the builders.
-func (m *PetMutation) OwningUserIDs() (ids []int) {
+func (m *PetMutation) OwningUserIDs() (ids []*models.ID) {
 	if id := m.owningUser; id != nil {
 		ids = append(ids, *id)
 	}
@@ -402,7 +409,7 @@ func (m *PetMutation) OldField(ctx context.Context, name string) (ent.Value, err
 func (m *PetMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case pet.FieldOwnerID:
-		v, ok := value.(string)
+		v, ok := value.(*models.ID)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -416,7 +423,7 @@ func (m *PetMutation) SetField(name string, value ent.Value) error {
 		m.SetOwnerType(v)
 		return nil
 	case pet.FieldOwningUserID:
-		v, ok := value.(int)
+		v, ok := value.(*models.ID)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -436,16 +443,13 @@ func (m *PetMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *PetMutation) AddedFields() []string {
-	var fields []string
-	return fields
+	return nil
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *PetMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	}
 	return nil, false
 }
 
@@ -599,7 +603,7 @@ type UserMutation struct {
 	config
 	op            Op
 	typ           string
-	id            *int
+	id            **models.ID
 	name          *string
 	clearedFields map[string]struct{}
 	done          bool
@@ -627,7 +631,7 @@ func newUserMutation(c config, op Op, opts ...userOption) *UserMutation {
 }
 
 // withUserID sets the ID field of the mutation.
-func withUserID(id int) userOption {
+func withUserID(id *models.ID) userOption {
 	return func(m *UserMutation) {
 		var (
 			err   error
@@ -677,9 +681,15 @@ func (m UserMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of User entities.
+func (m *UserMutation) SetID(id *models.ID) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID
 // is only available if it was provided to the builder.
-func (m *UserMutation) ID() (id int, exists bool) {
+func (m *UserMutation) ID() (id *models.ID, exists bool) {
 	if m.id == nil {
 		return
 	}
