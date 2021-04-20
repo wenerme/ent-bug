@@ -9,7 +9,8 @@ import (
 	"time"
 )
 
-var idType = new(models.ID)
+var idPtrType = new(models.ID)
+var idType = models.ID("")
 
 type IDMixin struct {
 	mixin.Schema
@@ -17,7 +18,7 @@ type IDMixin struct {
 
 func (IDMixin) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id").GoType(models.ID("")).Unique().Immutable().Annotations(),
+		field.String("id").GoType(idType).Unique().Immutable().Annotations(),
 	}
 }
 func (IDMixin) Hooks() []ent.Hook {
