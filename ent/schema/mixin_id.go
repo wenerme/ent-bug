@@ -5,8 +5,8 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/mixin"
+	"github.com/google/uuid"
 	"github.com/wenerme/ent-demo/models"
-	"time"
 )
 
 var idPtrType = models.ID("")
@@ -47,5 +47,5 @@ func HookID() ent.Hook {
 
 var NextID = func(ctx context.Context, mutation ent.Mutation) (models.ID, error) {
 	// test only
-	return models.ID(time.Now().String()), nil
+	return models.ID(uuid.New().String()), nil
 }
