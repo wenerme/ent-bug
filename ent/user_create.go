@@ -9,9 +9,9 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/wenerme/ent-demo/ent/user"
 	"github.com/wenerme/ent-demo/models"
-	"github.com/xtgo/uuid"
 )
 
 // UserCreate is the builder for creating a User entity.

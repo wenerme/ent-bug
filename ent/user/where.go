@@ -4,9 +4,9 @@ package user
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"github.com/google/uuid"
 	"github.com/wenerme/ent-demo/ent/predicate"
 	"github.com/wenerme/ent-demo/models"
-	"github.com/xtgo/uuid"
 )
 
 // ID filters vertices based on their ID field.

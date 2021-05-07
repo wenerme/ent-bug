@@ -4,7 +4,7 @@ package user
 
 import (
 	"entgo.io/ent"
-	"github.com/xtgo/uuid"
+	"github.com/google/uuid"
 )
 
 const (

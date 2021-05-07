@@ -3,10 +3,10 @@
 package runtime
 
 import (
+	"github.com/google/uuid"
 	"github.com/wenerme/ent-demo/ent/pet"
 	"github.com/wenerme/ent-demo/ent/schema"
 	"github.com/wenerme/ent-demo/ent/user"
-	"github.com/xtgo/uuid"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -38,6 +38,6 @@ func init() {
 }
 
 const (
-	Version = "v0.8.1-0.20210420081359-cad5e7840a4c"            // Version of ent codegen.
-	Sum     = "h1:bznuyXnDnZ7aCUCHB5R8TvUYruJ7McE/h7MOpU7cOCo=" // Sum of ent codegen.
+	Version = "v0.8.1-0.20210506074326-8837b53115bd"            // Version of ent codegen.
+	Sum     = "h1:3a7gkaQ6/x/RJZhhDenbErKlg4bDmWqG9MZiRlNObts=" // Sum of ent codegen.
 )

@@ -9,9 +9,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/wenerme/ent-demo/ent/predicate"
 	"github.com/wenerme/ent-demo/ent/user"
-	"github.com/xtgo/uuid"
 )
 
 // UserUpdate is the builder for updating User entities.

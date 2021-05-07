@@ -22,7 +22,7 @@ func (u ID) MarshalGQL(w io.Writer) {
 // Scan implements the Scanner interface.
 func (u *ID) Scan(src interface{}) error {
 	if src == nil {
-		return fmt.Errorf("id: expected a value")
+		return nil
 	}
 	s, ok := src.(string)
 	if !ok {

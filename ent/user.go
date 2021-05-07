@@ -7,9 +7,9 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/google/uuid"
 	"github.com/wenerme/ent-demo/ent/user"
 	"github.com/wenerme/ent-demo/models"
-	"github.com/xtgo/uuid"
 )
 
 // User is the model entity for the User schema.

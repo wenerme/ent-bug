@@ -7,10 +7,10 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/google/uuid"
 	"github.com/wenerme/ent-demo/ent/pet"
 	"github.com/wenerme/ent-demo/ent/user"
 	"github.com/wenerme/ent-demo/models"
-	"github.com/xtgo/uuid"
 )
 
 // Pet is the model entity for the Pet schema.

@@ -11,6 +11,8 @@ import (
 )
 
 var idPtrType = models.ID("")
+
+//var idPtrType = (*models.ID)(nil)
 var idType = models.ID("")
 
 type IDMixin struct {

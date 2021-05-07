@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/google/uuid"
 	"github.com/wenerme/ent-demo/ent/pet"
 	"github.com/wenerme/ent-demo/ent/predicate"
 	"github.com/wenerme/ent-demo/ent/user"
 	"github.com/wenerme/ent-demo/models"
-	"github.com/xtgo/uuid"
 
 	"entgo.io/ent"
 )
