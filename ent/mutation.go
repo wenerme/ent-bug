@@ -35,9 +35,10 @@ type PetMutation struct {
 	op                Op
 	typ               string
 	id                *models.ID
-	uid               **uuid.UUID
+	uid               *uuid.UUID
 	ownerID           *models.ID
 	ownerType         *string
+	ownerUID          *uuid.UUID
 	name              *string
 	clearedFields     map[string]struct{}
 	owningUser        *models.ID
@@ -133,12 +134,12 @@ func (m *PetMutation) ID() (id models.ID, exists bool) {
 }
 
 // SetUID sets the "uid" field.
-func (m *PetMutation) SetUID(u *uuid.UUID) {
+func (m *PetMutation) SetUID(u uuid.UUID) {
 	m.uid = &u
 }
 
 // UID returns the value of the "uid" field in the mutation.
-func (m *PetMutation) UID() (r *uuid.UUID, exists bool) {
+func (m *PetMutation) UID() (r uuid.UUID, exists bool) {
 	v := m.uid
 	if v == nil {
 		return
@@ -149,7 +150,7 @@ func (m *PetMutation) UID() (r *uuid.UUID, exists bool) {
 // OldUID returns the old "uid" field's value of the Pet entity.
 // If the Pet object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PetMutation) OldUID(ctx context.Context) (v *uuid.UUID, err error) {
+func (m *PetMutation) OldUID(ctx context.Context) (v uuid.UUID, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldUID is only allowed on UpdateOne operations")
 	}
@@ -163,22 +164,9 @@ func (m *PetMutation) OldUID(ctx context.Context) (v *uuid.UUID, err error) {
 	return oldValue.UID, nil
 }
 
-// ClearUID clears the value of the "uid" field.
-func (m *PetMutation) ClearUID() {
-	m.uid = nil
-	m.clearedFields[pet.FieldUID] = struct{}{}
-}
-
-// UIDCleared returns if the "uid" field was cleared in this mutation.
-func (m *PetMutation) UIDCleared() bool {
-	_, ok := m.clearedFields[pet.FieldUID]
-	return ok
-}
-
 // ResetUID resets all changes to the "uid" field.
 func (m *PetMutation) ResetUID() {
 	m.uid = nil
-	delete(m.clearedFields, pet.FieldUID)
 }
 
 // SetOwnerID sets the "ownerID" field.
@@ -328,6 +316,55 @@ func (m *PetMutation) ResetOwningUserID() {
 	delete(m.clearedFields, pet.FieldOwningUserID)
 }
 
+// SetOwnerUID sets the "ownerUID" field.
+func (m *PetMutation) SetOwnerUID(u uuid.UUID) {
+	m.ownerUID = &u
+}
+
+// OwnerUID returns the value of the "ownerUID" field in the mutation.
+func (m *PetMutation) OwnerUID() (r uuid.UUID, exists bool) {
+	v := m.ownerUID
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOwnerUID returns the old "ownerUID" field's value of the Pet entity.
+// If the Pet object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PetMutation) OldOwnerUID(ctx context.Context) (v *uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldOwnerUID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldOwnerUID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOwnerUID: %w", err)
+	}
+	return oldValue.OwnerUID, nil
+}
+
+// ClearOwnerUID clears the value of the "ownerUID" field.
+func (m *PetMutation) ClearOwnerUID() {
+	m.ownerUID = nil
+	m.clearedFields[pet.FieldOwnerUID] = struct{}{}
+}
+
+// OwnerUIDCleared returns if the "ownerUID" field was cleared in this mutation.
+func (m *PetMutation) OwnerUIDCleared() bool {
+	_, ok := m.clearedFields[pet.FieldOwnerUID]
+	return ok
+}
+
+// ResetOwnerUID resets all changes to the "ownerUID" field.
+func (m *PetMutation) ResetOwnerUID() {
+	m.ownerUID = nil
+	delete(m.clearedFields, pet.FieldOwnerUID)
+}
+
 // SetName sets the "name" field.
 func (m *PetMutation) SetName(s string) {
 	m.name = &s
@@ -404,7 +441,7 @@ func (m *PetMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PetMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.uid != nil {
 		fields = append(fields, pet.FieldUID)
 	}
@@ -416,6 +453,9 @@ func (m *PetMutation) Fields() []string {
 	}
 	if m.owningUser != nil {
 		fields = append(fields, pet.FieldOwningUserID)
+	}
+	if m.ownerUID != nil {
+		fields = append(fields, pet.FieldOwnerUID)
 	}
 	if m.name != nil {
 		fields = append(fields, pet.FieldName)
@@ -436,6 +476,8 @@ func (m *PetMutation) Field(name string) (ent.Value, bool) {
 		return m.OwnerType()
 	case pet.FieldOwningUserID:
 		return m.OwningUserID()
+	case pet.FieldOwnerUID:
+		return m.OwnerUID()
 	case pet.FieldName:
 		return m.Name()
 	}
@@ -455,6 +497,8 @@ func (m *PetMutation) OldField(ctx context.Context, name string) (ent.Value, err
 		return m.OldOwnerType(ctx)
 	case pet.FieldOwningUserID:
 		return m.OldOwningUserID(ctx)
+	case pet.FieldOwnerUID:
+		return m.OldOwnerUID(ctx)
 	case pet.FieldName:
 		return m.OldName(ctx)
 	}
@@ -467,7 +511,7 @@ func (m *PetMutation) OldField(ctx context.Context, name string) (ent.Value, err
 func (m *PetMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case pet.FieldUID:
-		v, ok := value.(*uuid.UUID)
+		v, ok := value.(uuid.UUID)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -493,6 +537,13 @@ func (m *PetMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetOwningUserID(v)
+		return nil
+	case pet.FieldOwnerUID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOwnerUID(v)
 		return nil
 	case pet.FieldName:
 		v, ok := value.(string)
@@ -531,9 +582,6 @@ func (m *PetMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *PetMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(pet.FieldUID) {
-		fields = append(fields, pet.FieldUID)
-	}
 	if m.FieldCleared(pet.FieldOwnerID) {
 		fields = append(fields, pet.FieldOwnerID)
 	}
@@ -542,6 +590,9 @@ func (m *PetMutation) ClearedFields() []string {
 	}
 	if m.FieldCleared(pet.FieldOwningUserID) {
 		fields = append(fields, pet.FieldOwningUserID)
+	}
+	if m.FieldCleared(pet.FieldOwnerUID) {
+		fields = append(fields, pet.FieldOwnerUID)
 	}
 	return fields
 }
@@ -557,9 +608,6 @@ func (m *PetMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *PetMutation) ClearField(name string) error {
 	switch name {
-	case pet.FieldUID:
-		m.ClearUID()
-		return nil
 	case pet.FieldOwnerID:
 		m.ClearOwnerID()
 		return nil
@@ -568,6 +616,9 @@ func (m *PetMutation) ClearField(name string) error {
 		return nil
 	case pet.FieldOwningUserID:
 		m.ClearOwningUserID()
+		return nil
+	case pet.FieldOwnerUID:
+		m.ClearOwnerUID()
 		return nil
 	}
 	return fmt.Errorf("unknown Pet nullable field %s", name)
@@ -588,6 +639,9 @@ func (m *PetMutation) ResetField(name string) error {
 		return nil
 	case pet.FieldOwningUserID:
 		m.ResetOwningUserID()
+		return nil
+	case pet.FieldOwnerUID:
+		m.ResetOwnerUID()
 		return nil
 	case pet.FieldName:
 		m.ResetName()
@@ -678,7 +732,7 @@ type UserMutation struct {
 	op            Op
 	typ           string
 	id            *models.ID
-	uid           **uuid.UUID
+	uid           *uuid.UUID
 	name          *string
 	clearedFields map[string]struct{}
 	done          bool
@@ -772,12 +826,12 @@ func (m *UserMutation) ID() (id models.ID, exists bool) {
 }
 
 // SetUID sets the "uid" field.
-func (m *UserMutation) SetUID(u *uuid.UUID) {
+func (m *UserMutation) SetUID(u uuid.UUID) {
 	m.uid = &u
 }
 
 // UID returns the value of the "uid" field in the mutation.
-func (m *UserMutation) UID() (r *uuid.UUID, exists bool) {
+func (m *UserMutation) UID() (r uuid.UUID, exists bool) {
 	v := m.uid
 	if v == nil {
 		return
@@ -788,7 +842,7 @@ func (m *UserMutation) UID() (r *uuid.UUID, exists bool) {
 // OldUID returns the old "uid" field's value of the User entity.
 // If the User object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldUID(ctx context.Context) (v *uuid.UUID, err error) {
+func (m *UserMutation) OldUID(ctx context.Context) (v uuid.UUID, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldUID is only allowed on UpdateOne operations")
 	}
@@ -802,22 +856,9 @@ func (m *UserMutation) OldUID(ctx context.Context) (v *uuid.UUID, err error) {
 	return oldValue.UID, nil
 }
 
-// ClearUID clears the value of the "uid" field.
-func (m *UserMutation) ClearUID() {
-	m.uid = nil
-	m.clearedFields[user.FieldUID] = struct{}{}
-}
-
-// UIDCleared returns if the "uid" field was cleared in this mutation.
-func (m *UserMutation) UIDCleared() bool {
-	_, ok := m.clearedFields[user.FieldUID]
-	return ok
-}
-
 // ResetUID resets all changes to the "uid" field.
 func (m *UserMutation) ResetUID() {
 	m.uid = nil
-	delete(m.clearedFields, user.FieldUID)
 }
 
 // SetName sets the "name" field.
@@ -912,7 +953,7 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 func (m *UserMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case user.FieldUID:
-		v, ok := value.(*uuid.UUID)
+		v, ok := value.(uuid.UUID)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -954,11 +995,7 @@ func (m *UserMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *UserMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(user.FieldUID) {
-		fields = append(fields, user.FieldUID)
-	}
-	return fields
+	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -971,11 +1008,6 @@ func (m *UserMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *UserMutation) ClearField(name string) error {
-	switch name {
-	case user.FieldUID:
-		m.ClearUID()
-		return nil
-	}
 	return fmt.Errorf("unknown User nullable field %s", name)
 }
 

@@ -46,5 +46,5 @@ func ValidColumn(column string) bool {
 var (
 	Hooks [1]ent.Hook
 	// DefaultUID holds the default value on creation for the "uid" field.
-	DefaultUID func() *uuid.UUID
+	DefaultUID func() uuid.UUID
 )

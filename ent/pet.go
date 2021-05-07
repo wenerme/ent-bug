@@ -19,13 +19,15 @@ type Pet struct {
 	// ID of the ent.
 	ID models.ID `json:"id,omitempty"`
 	// UID holds the value of the "uid" field.
-	UID *uuid.UUID `json:"uid,omitempty"`
+	UID uuid.UUID `json:"uid,omitempty"`
 	// OwnerID holds the value of the "ownerID" field.
 	OwnerID *models.ID `json:"ownerID,omitempty"`
 	// OwnerType holds the value of the "ownerType" field.
 	OwnerType *string `json:"ownerType,omitempty"`
 	// OwningUserID holds the value of the "owningUserID" field.
 	OwningUserID *models.ID `json:"owningUserID,omitempty"`
+	// OwnerUID holds the value of the "ownerUID" field.
+	OwnerUID *uuid.UUID `json:"ownerUID,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -63,12 +65,12 @@ func (*Pet) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case pet.FieldOwnerID, pet.FieldOwningUserID:
 			values[i] = &sql.NullScanner{S: new(models.ID)}
-		case pet.FieldUID:
-			values[i] = new(*uuid.UUID)
 		case pet.FieldID:
 			values[i] = new(models.ID)
 		case pet.FieldOwnerType, pet.FieldName:
 			values[i] = new(sql.NullString)
+		case pet.FieldUID, pet.FieldOwnerUID:
+			values[i] = new(uuid.UUID)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Pet", columns[i])
 		}
@@ -91,7 +93,7 @@ func (pe *Pet) assignValues(columns []string, values []interface{}) error {
 				pe.ID = *value
 			}
 		case pet.FieldUID:
-			if value, ok := values[i].(**uuid.UUID); !ok {
+			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field uid", values[i])
 			} else if value != nil {
 				pe.UID = *value
@@ -116,6 +118,12 @@ func (pe *Pet) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				pe.OwningUserID = new(models.ID)
 				*pe.OwningUserID = *value.S.(*models.ID)
+			}
+		case pet.FieldOwnerUID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field ownerUID", values[i])
+			} else if value != nil {
+				pe.OwnerUID = value
 			}
 		case pet.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -168,6 +176,10 @@ func (pe *Pet) String() string {
 	}
 	if v := pe.OwningUserID; v != nil {
 		builder.WriteString(", owningUserID=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	if v := pe.OwnerUID; v != nil {
+		builder.WriteString(", ownerUID=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", name=")

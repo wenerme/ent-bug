@@ -6,6 +6,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
 	"entgo.io/ent/schema/mixin"
+	"github.com/google/uuid"
 )
 
 type HasOwnerMixin struct {
@@ -17,6 +18,7 @@ func (HasOwnerMixin) Fields() []ent.Field {
 		field.String("ownerID").GoType(idPtrType).Optional().Nillable(),
 		field.String("ownerType").Optional().Nillable(),
 		field.String("owningUserID").GoType(idPtrType).Optional().Nillable(),
+		field.UUID("ownerUID", uuid.New()).Optional().Nillable(),
 	}
 }
 func (HasOwnerMixin) Indexes() []ent.Index {

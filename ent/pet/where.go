@@ -94,7 +94,7 @@ func IDLTE(id models.ID) predicate.Pet {
 }
 
 // UID applies equality check predicate on the "uid" field. It's identical to UIDEQ.
-func UID(v *uuid.UUID) predicate.Pet {
+func UID(v uuid.UUID) predicate.Pet {
 	return predicate.Pet(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldUID), v))
 	})
@@ -121,6 +121,13 @@ func OwningUserID(v models.ID) predicate.Pet {
 	})
 }
 
+// OwnerUID applies equality check predicate on the "ownerUID" field. It's identical to OwnerUIDEQ.
+func OwnerUID(v uuid.UUID) predicate.Pet {
+	return predicate.Pet(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldOwnerUID), v))
+	})
+}
+
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.Pet {
 	return predicate.Pet(func(s *sql.Selector) {
@@ -129,21 +136,21 @@ func Name(v string) predicate.Pet {
 }
 
 // UIDEQ applies the EQ predicate on the "uid" field.
-func UIDEQ(v *uuid.UUID) predicate.Pet {
+func UIDEQ(v uuid.UUID) predicate.Pet {
 	return predicate.Pet(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldUID), v))
 	})
 }
 
 // UIDNEQ applies the NEQ predicate on the "uid" field.
-func UIDNEQ(v *uuid.UUID) predicate.Pet {
+func UIDNEQ(v uuid.UUID) predicate.Pet {
 	return predicate.Pet(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldUID), v))
 	})
 }
 
 // UIDIn applies the In predicate on the "uid" field.
-func UIDIn(vs ...*uuid.UUID) predicate.Pet {
+func UIDIn(vs ...uuid.UUID) predicate.Pet {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -160,7 +167,7 @@ func UIDIn(vs ...*uuid.UUID) predicate.Pet {
 }
 
 // UIDNotIn applies the NotIn predicate on the "uid" field.
-func UIDNotIn(vs ...*uuid.UUID) predicate.Pet {
+func UIDNotIn(vs ...uuid.UUID) predicate.Pet {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -177,44 +184,30 @@ func UIDNotIn(vs ...*uuid.UUID) predicate.Pet {
 }
 
 // UIDGT applies the GT predicate on the "uid" field.
-func UIDGT(v *uuid.UUID) predicate.Pet {
+func UIDGT(v uuid.UUID) predicate.Pet {
 	return predicate.Pet(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldUID), v))
 	})
 }
 
 // UIDGTE applies the GTE predicate on the "uid" field.
-func UIDGTE(v *uuid.UUID) predicate.Pet {
+func UIDGTE(v uuid.UUID) predicate.Pet {
 	return predicate.Pet(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldUID), v))
 	})
 }
 
 // UIDLT applies the LT predicate on the "uid" field.
-func UIDLT(v *uuid.UUID) predicate.Pet {
+func UIDLT(v uuid.UUID) predicate.Pet {
 	return predicate.Pet(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldUID), v))
 	})
 }
 
 // UIDLTE applies the LTE predicate on the "uid" field.
-func UIDLTE(v *uuid.UUID) predicate.Pet {
+func UIDLTE(v uuid.UUID) predicate.Pet {
 	return predicate.Pet(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldUID), v))
-	})
-}
-
-// UIDIsNil applies the IsNil predicate on the "uid" field.
-func UIDIsNil() predicate.Pet {
-	return predicate.Pet(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldUID)))
-	})
-}
-
-// UIDNotNil applies the NotNil predicate on the "uid" field.
-func UIDNotNil() predicate.Pet {
-	return predicate.Pet(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldUID)))
 	})
 }
 
@@ -600,6 +593,96 @@ func OwningUserIDContainsFold(v models.ID) predicate.Pet {
 	vc := string(v)
 	return predicate.Pet(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldOwningUserID), vc))
+	})
+}
+
+// OwnerUIDEQ applies the EQ predicate on the "ownerUID" field.
+func OwnerUIDEQ(v uuid.UUID) predicate.Pet {
+	return predicate.Pet(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldOwnerUID), v))
+	})
+}
+
+// OwnerUIDNEQ applies the NEQ predicate on the "ownerUID" field.
+func OwnerUIDNEQ(v uuid.UUID) predicate.Pet {
+	return predicate.Pet(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldOwnerUID), v))
+	})
+}
+
+// OwnerUIDIn applies the In predicate on the "ownerUID" field.
+func OwnerUIDIn(vs ...uuid.UUID) predicate.Pet {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Pet(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldOwnerUID), v...))
+	})
+}
+
+// OwnerUIDNotIn applies the NotIn predicate on the "ownerUID" field.
+func OwnerUIDNotIn(vs ...uuid.UUID) predicate.Pet {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Pet(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldOwnerUID), v...))
+	})
+}
+
+// OwnerUIDGT applies the GT predicate on the "ownerUID" field.
+func OwnerUIDGT(v uuid.UUID) predicate.Pet {
+	return predicate.Pet(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldOwnerUID), v))
+	})
+}
+
+// OwnerUIDGTE applies the GTE predicate on the "ownerUID" field.
+func OwnerUIDGTE(v uuid.UUID) predicate.Pet {
+	return predicate.Pet(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldOwnerUID), v))
+	})
+}
+
+// OwnerUIDLT applies the LT predicate on the "ownerUID" field.
+func OwnerUIDLT(v uuid.UUID) predicate.Pet {
+	return predicate.Pet(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldOwnerUID), v))
+	})
+}
+
+// OwnerUIDLTE applies the LTE predicate on the "ownerUID" field.
+func OwnerUIDLTE(v uuid.UUID) predicate.Pet {
+	return predicate.Pet(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldOwnerUID), v))
+	})
+}
+
+// OwnerUIDIsNil applies the IsNil predicate on the "ownerUID" field.
+func OwnerUIDIsNil() predicate.Pet {
+	return predicate.Pet(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldOwnerUID)))
+	})
+}
+
+// OwnerUIDNotNil applies the NotNil predicate on the "ownerUID" field.
+func OwnerUIDNotNil() predicate.Pet {
+	return predicate.Pet(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldOwnerUID)))
 	})
 }
 

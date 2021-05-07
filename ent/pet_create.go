@@ -23,7 +23,7 @@ type PetCreate struct {
 }
 
 // SetUID sets the "uid" field.
-func (pc *PetCreate) SetUID(u *uuid.UUID) *PetCreate {
+func (pc *PetCreate) SetUID(u uuid.UUID) *PetCreate {
 	pc.mutation.SetUID(u)
 	return pc
 }
@@ -67,6 +67,12 @@ func (pc *PetCreate) SetNillableOwningUserID(m *models.ID) *PetCreate {
 	if m != nil {
 		pc.SetOwningUserID(*m)
 	}
+	return pc
+}
+
+// SetOwnerUID sets the "ownerUID" field.
+func (pc *PetCreate) SetOwnerUID(u uuid.UUID) *PetCreate {
+	pc.mutation.SetOwnerUID(u)
 	return pc
 }
 
@@ -147,6 +153,9 @@ func (pc *PetCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (pc *PetCreate) check() error {
+	if _, ok := pc.mutation.UID(); !ok {
+		return &ValidationError{Name: "uid", err: errors.New("ent: missing required field \"uid\"")}
+	}
 	if _, ok := pc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New("ent: missing required field \"name\"")}
 	}
@@ -202,6 +211,14 @@ func (pc *PetCreate) createSpec() (*Pet, *sqlgraph.CreateSpec) {
 			Column: pet.FieldOwnerType,
 		})
 		_node.OwnerType = &value
+	}
+	if value, ok := pc.mutation.OwnerUID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: pet.FieldOwnerUID,
+		})
+		_node.OwnerUID = &value
 	}
 	if value, ok := pc.mutation.Name(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

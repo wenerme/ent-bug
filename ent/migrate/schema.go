@@ -11,9 +11,10 @@ var (
 	// PetsColumns holds the columns for the "pets" table.
 	PetsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Unique: true},
-		{Name: "uid", Type: field.TypeUUID, Nullable: true},
+		{Name: "uid", Type: field.TypeUUID, Unique: true, Default: "gen_random_uuid()"},
 		{Name: "owner_id", Type: field.TypeString, Nullable: true},
 		{Name: "owner_type", Type: field.TypeString, Nullable: true},
+		{Name: "owner_uid", Type: field.TypeUUID, Nullable: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "owning_user_id", Type: field.TypeString, Nullable: true},
 	}
@@ -25,7 +26,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "pets_users_owningUser",
-				Columns:    []*schema.Column{PetsColumns[5]},
+				Columns:    []*schema.Column{PetsColumns[6]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -41,7 +42,7 @@ var (
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Unique: true},
-		{Name: "uid", Type: field.TypeUUID, Nullable: true},
+		{Name: "uid", Type: field.TypeUUID, Unique: true, Default: "gen_random_uuid()"},
 		{Name: "name", Type: field.TypeString},
 	}
 	// UsersTable holds the schema information for the "users" table.

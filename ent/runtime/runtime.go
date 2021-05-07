@@ -23,7 +23,7 @@ func init() {
 	// petDescUID is the schema descriptor for uid field.
 	petDescUID := petMixinFields0[1].Descriptor()
 	// pet.DefaultUID holds the default value on creation for the uid field.
-	pet.DefaultUID = petDescUID.Default.(func() *uuid.UUID)
+	pet.DefaultUID = petDescUID.Default.(func() uuid.UUID)
 	userMixin := schema.User{}.Mixin()
 	userMixinHooks0 := userMixin[0].Hooks()
 	user.Hooks[0] = userMixinHooks0[0]
@@ -34,7 +34,7 @@ func init() {
 	// userDescUID is the schema descriptor for uid field.
 	userDescUID := userMixinFields0[1].Descriptor()
 	// user.DefaultUID holds the default value on creation for the uid field.
-	user.DefaultUID = userDescUID.Default.(func() *uuid.UUID)
+	user.DefaultUID = userDescUID.Default.(func() uuid.UUID)
 }
 
 const (

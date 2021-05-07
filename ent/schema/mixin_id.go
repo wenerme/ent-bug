@@ -22,10 +22,18 @@ type IDMixin struct {
 func (IDMixin) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("id").GoType(idType).Unique().Immutable().Annotations(),
-		field.UUID("uid", new(uuid.UUID)).Default(func() *uuid.UUID {
-			u := uuid.New()
-			return &u
-		}).Optional().Annotations(entsql.Annotation{}),
+		//field.UUID("uid", new(uuid.UUID)).Default(func() *uuid.UUID {
+		//	u := uuid.New()
+		//	return &u
+		//}).Optional().Annotations(entsql.Annotation{}),
+		field.UUID("uid", uuid.New()).Default(uuid.New).Unique().Immutable().Annotations(
+			entsql.Annotation{
+				// 需要针对 UUID 特殊处理 - https://github.com/ent/ent/pull/1462
+				// unsupported default type: [16]byte
+				// https://github.com/chris-rock/ent/blob/7b4e3e1aa607fa648fc508b58fbe40b0779c369a/dialect/sql/schema/schema.go#L267
+				Default: "gen_random_uuid()",
+			},
+		),
 	}
 }
 func (IDMixin) Hooks() []ent.Hook {

@@ -29,18 +29,6 @@ func (pu *PetUpdate) Where(ps ...predicate.Pet) *PetUpdate {
 	return pu
 }
 
-// SetUID sets the "uid" field.
-func (pu *PetUpdate) SetUID(u *uuid.UUID) *PetUpdate {
-	pu.mutation.SetUID(u)
-	return pu
-}
-
-// ClearUID clears the value of the "uid" field.
-func (pu *PetUpdate) ClearUID() *PetUpdate {
-	pu.mutation.ClearUID()
-	return pu
-}
-
 // SetOwnerID sets the "ownerID" field.
 func (pu *PetUpdate) SetOwnerID(m models.ID) *PetUpdate {
 	pu.mutation.SetOwnerID(m)
@@ -98,6 +86,18 @@ func (pu *PetUpdate) SetNillableOwningUserID(m *models.ID) *PetUpdate {
 // ClearOwningUserID clears the value of the "owningUserID" field.
 func (pu *PetUpdate) ClearOwningUserID() *PetUpdate {
 	pu.mutation.ClearOwningUserID()
+	return pu
+}
+
+// SetOwnerUID sets the "ownerUID" field.
+func (pu *PetUpdate) SetOwnerUID(u uuid.UUID) *PetUpdate {
+	pu.mutation.SetOwnerUID(u)
+	return pu
+}
+
+// ClearOwnerUID clears the value of the "ownerUID" field.
+func (pu *PetUpdate) ClearOwnerUID() *PetUpdate {
+	pu.mutation.ClearOwnerUID()
 	return pu
 }
 
@@ -192,19 +192,6 @@ func (pu *PetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := pu.mutation.UID(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeUUID,
-			Value:  value,
-			Column: pet.FieldUID,
-		})
-	}
-	if pu.mutation.UIDCleared() {
-		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeUUID,
-			Column: pet.FieldUID,
-		})
-	}
 	if value, ok := pu.mutation.OwnerID(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -229,6 +216,19 @@ func (pu *PetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Column: pet.FieldOwnerType,
+		})
+	}
+	if value, ok := pu.mutation.OwnerUID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: pet.FieldOwnerUID,
+		})
+	}
+	if pu.mutation.OwnerUIDCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Column: pet.FieldOwnerUID,
 		})
 	}
 	if value, ok := pu.mutation.Name(); ok {
@@ -292,18 +292,6 @@ type PetUpdateOne struct {
 	mutation *PetMutation
 }
 
-// SetUID sets the "uid" field.
-func (puo *PetUpdateOne) SetUID(u *uuid.UUID) *PetUpdateOne {
-	puo.mutation.SetUID(u)
-	return puo
-}
-
-// ClearUID clears the value of the "uid" field.
-func (puo *PetUpdateOne) ClearUID() *PetUpdateOne {
-	puo.mutation.ClearUID()
-	return puo
-}
-
 // SetOwnerID sets the "ownerID" field.
 func (puo *PetUpdateOne) SetOwnerID(m models.ID) *PetUpdateOne {
 	puo.mutation.SetOwnerID(m)
@@ -361,6 +349,18 @@ func (puo *PetUpdateOne) SetNillableOwningUserID(m *models.ID) *PetUpdateOne {
 // ClearOwningUserID clears the value of the "owningUserID" field.
 func (puo *PetUpdateOne) ClearOwningUserID() *PetUpdateOne {
 	puo.mutation.ClearOwningUserID()
+	return puo
+}
+
+// SetOwnerUID sets the "ownerUID" field.
+func (puo *PetUpdateOne) SetOwnerUID(u uuid.UUID) *PetUpdateOne {
+	puo.mutation.SetOwnerUID(u)
+	return puo
+}
+
+// ClearOwnerUID clears the value of the "ownerUID" field.
+func (puo *PetUpdateOne) ClearOwnerUID() *PetUpdateOne {
+	puo.mutation.ClearOwnerUID()
 	return puo
 }
 
@@ -479,19 +479,6 @@ func (puo *PetUpdateOne) sqlSave(ctx context.Context) (_node *Pet, err error) {
 			}
 		}
 	}
-	if value, ok := puo.mutation.UID(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeUUID,
-			Value:  value,
-			Column: pet.FieldUID,
-		})
-	}
-	if puo.mutation.UIDCleared() {
-		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeUUID,
-			Column: pet.FieldUID,
-		})
-	}
 	if value, ok := puo.mutation.OwnerID(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -516,6 +503,19 @@ func (puo *PetUpdateOne) sqlSave(ctx context.Context) (_node *Pet, err error) {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Column: pet.FieldOwnerType,
+		})
+	}
+	if value, ok := puo.mutation.OwnerUID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: pet.FieldOwnerUID,
+		})
+	}
+	if puo.mutation.OwnerUIDCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Column: pet.FieldOwnerUID,
 		})
 	}
 	if value, ok := puo.mutation.Name(); ok {

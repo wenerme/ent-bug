@@ -3,6 +3,7 @@ package test
 import (
 	"context"
 	"github.com/davecgh/go-spew/spew"
+	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/wenerme/ent-demo/ent"
 	"github.com/wenerme/ent-demo/ent/enttest"

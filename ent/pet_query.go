@@ -291,7 +291,7 @@ func (pq *PetQuery) WithOwningUser(opts ...func(*UserQuery)) *PetQuery {
 // Example:
 //
 //	var v []struct {
-//		UID *uuid.UUID `json:"uid,omitempty"`
+//		UID uuid.UUID `json:"uid,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -318,7 +318,7 @@ func (pq *PetQuery) GroupBy(field string, fields ...string) *PetGroupBy {
 // Example:
 //
 //	var v []struct {
-//		UID *uuid.UUID `json:"uid,omitempty"`
+//		UID uuid.UUID `json:"uid,omitempty"`
 //	}
 //
 //	client.Pet.Query().
