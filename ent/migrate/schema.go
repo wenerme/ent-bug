@@ -44,6 +44,7 @@ var (
 		{Name: "id", Type: field.TypeString, Unique: true},
 		{Name: "uid", Type: field.TypeUUID, Unique: true, Default: "gen_random_uuid()"},
 		{Name: "name", Type: field.TypeString},
+		{Name: "birth", Type: field.TypeTime, Nullable: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{

@@ -5,6 +5,7 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
@@ -21,6 +22,8 @@ type User struct {
 	UID uuid.UUID `json:"uid,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
+	// Birth holds the value of the "birth" field.
+	Birth *time.Time `json:"birth,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -32,6 +35,8 @@ func (*User) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(models.ID)
 		case user.FieldName:
 			values[i] = new(sql.NullString)
+		case user.FieldBirth:
+			values[i] = new(sql.NullTime)
 		case user.FieldUID:
 			values[i] = new(uuid.UUID)
 		default:
@@ -67,6 +72,13 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				u.Name = value.String
 			}
+		case user.FieldBirth:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field birth", values[i])
+			} else if value.Valid {
+				u.Birth = new(time.Time)
+				*u.Birth = value.Time
+			}
 		}
 	}
 	return nil
@@ -99,6 +111,10 @@ func (u *User) String() string {
 	builder.WriteString(fmt.Sprintf("%v", u.UID))
 	builder.WriteString(", name=")
 	builder.WriteString(u.Name)
+	if v := u.Birth; v != nil {
+		builder.WriteString(", birth=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

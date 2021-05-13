@@ -5,6 +5,7 @@ package ent
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -29,6 +30,26 @@ func (uu *UserUpdate) Where(ps ...predicate.User) *UserUpdate {
 // SetName sets the "name" field.
 func (uu *UserUpdate) SetName(s string) *UserUpdate {
 	uu.mutation.SetName(s)
+	return uu
+}
+
+// SetBirth sets the "birth" field.
+func (uu *UserUpdate) SetBirth(t time.Time) *UserUpdate {
+	uu.mutation.SetBirth(t)
+	return uu
+}
+
+// SetNillableBirth sets the "birth" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableBirth(t *time.Time) *UserUpdate {
+	if t != nil {
+		uu.SetBirth(*t)
+	}
+	return uu
+}
+
+// ClearBirth clears the value of the "birth" field.
+func (uu *UserUpdate) ClearBirth() *UserUpdate {
+	uu.mutation.ClearBirth()
 	return uu
 }
 
@@ -113,6 +134,19 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: user.FieldName,
 		})
 	}
+	if value, ok := uu.mutation.Birth(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: user.FieldBirth,
+		})
+	}
+	if uu.mutation.BirthCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: user.FieldBirth,
+		})
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -135,6 +169,26 @@ type UserUpdateOne struct {
 // SetName sets the "name" field.
 func (uuo *UserUpdateOne) SetName(s string) *UserUpdateOne {
 	uuo.mutation.SetName(s)
+	return uuo
+}
+
+// SetBirth sets the "birth" field.
+func (uuo *UserUpdateOne) SetBirth(t time.Time) *UserUpdateOne {
+	uuo.mutation.SetBirth(t)
+	return uuo
+}
+
+// SetNillableBirth sets the "birth" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableBirth(t *time.Time) *UserUpdateOne {
+	if t != nil {
+		uuo.SetBirth(*t)
+	}
+	return uuo
+}
+
+// ClearBirth clears the value of the "birth" field.
+func (uuo *UserUpdateOne) ClearBirth() *UserUpdateOne {
+	uuo.mutation.ClearBirth()
 	return uuo
 }
 
@@ -241,6 +295,19 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Type:   field.TypeString,
 			Value:  value,
 			Column: user.FieldName,
+		})
+	}
+	if value, ok := uuo.mutation.Birth(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: user.FieldBirth,
+		})
+	}
+	if uuo.mutation.BirthCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: user.FieldBirth,
 		})
 	}
 	_node = &User{config: uuo.config}

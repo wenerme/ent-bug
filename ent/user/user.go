@@ -16,6 +16,8 @@ const (
 	FieldUID = "uid"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldBirth holds the string denoting the birth field in the database.
+	FieldBirth = "birth"
 	// Table holds the table name of the user in the database.
 	Table = "users"
 )
@@ -25,6 +27,7 @@ var Columns = []string{
 	FieldID,
 	FieldUID,
 	FieldName,
+	FieldBirth,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

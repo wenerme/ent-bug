@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -30,6 +31,20 @@ func (uc *UserCreate) SetUID(u uuid.UUID) *UserCreate {
 // SetName sets the "name" field.
 func (uc *UserCreate) SetName(s string) *UserCreate {
 	uc.mutation.SetName(s)
+	return uc
+}
+
+// SetBirth sets the "birth" field.
+func (uc *UserCreate) SetBirth(t time.Time) *UserCreate {
+	uc.mutation.SetBirth(t)
+	return uc
+}
+
+// SetNillableBirth sets the "birth" field if the given value is not nil.
+func (uc *UserCreate) SetNillableBirth(t *time.Time) *UserCreate {
+	if t != nil {
+		uc.SetBirth(*t)
+	}
 	return uc
 }
 
@@ -149,6 +164,14 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Column: user.FieldName,
 		})
 		_node.Name = value
+	}
+	if value, ok := uc.mutation.Birth(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: user.FieldBirth,
+		})
+		_node.Birth = &value
 	}
 	return _node, _spec
 }

@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
 )
@@ -14,6 +15,7 @@ type User struct {
 func (User) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name"),
+		field.Time("birth").Nillable().Optional().Annotations(entgql.OrderField("Birth")),
 	}
 }
 

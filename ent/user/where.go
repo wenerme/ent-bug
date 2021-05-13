@@ -3,6 +3,8 @@
 package user
 
 import (
+	"time"
+
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
 	"github.com/wenerme/ent-demo/ent/predicate"
@@ -103,6 +105,13 @@ func UID(v uuid.UUID) predicate.User {
 func Name(v string) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldName), v))
+	})
+}
+
+// Birth applies equality check predicate on the "birth" field. It's identical to BirthEQ.
+func Birth(v time.Time) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldBirth), v))
 	})
 }
 
@@ -290,6 +299,96 @@ func NameEqualFold(v string) predicate.User {
 func NameContainsFold(v string) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldName), v))
+	})
+}
+
+// BirthEQ applies the EQ predicate on the "birth" field.
+func BirthEQ(v time.Time) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldBirth), v))
+	})
+}
+
+// BirthNEQ applies the NEQ predicate on the "birth" field.
+func BirthNEQ(v time.Time) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldBirth), v))
+	})
+}
+
+// BirthIn applies the In predicate on the "birth" field.
+func BirthIn(vs ...time.Time) predicate.User {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.User(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldBirth), v...))
+	})
+}
+
+// BirthNotIn applies the NotIn predicate on the "birth" field.
+func BirthNotIn(vs ...time.Time) predicate.User {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.User(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldBirth), v...))
+	})
+}
+
+// BirthGT applies the GT predicate on the "birth" field.
+func BirthGT(v time.Time) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldBirth), v))
+	})
+}
+
+// BirthGTE applies the GTE predicate on the "birth" field.
+func BirthGTE(v time.Time) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldBirth), v))
+	})
+}
+
+// BirthLT applies the LT predicate on the "birth" field.
+func BirthLT(v time.Time) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldBirth), v))
+	})
+}
+
+// BirthLTE applies the LTE predicate on the "birth" field.
+func BirthLTE(v time.Time) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldBirth), v))
+	})
+}
+
+// BirthIsNil applies the IsNil predicate on the "birth" field.
+func BirthIsNil() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldBirth)))
+	})
+}
+
+// BirthNotNil applies the NotNil predicate on the "birth" field.
+func BirthNotNil() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldBirth)))
 	})
 }
 

@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/wenerme/ent-demo/ent/pet"
@@ -734,6 +735,7 @@ type UserMutation struct {
 	id            *models.ID
 	uid           *uuid.UUID
 	name          *string
+	birth         *time.Time
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*User, error)
@@ -897,6 +899,55 @@ func (m *UserMutation) ResetName() {
 	m.name = nil
 }
 
+// SetBirth sets the "birth" field.
+func (m *UserMutation) SetBirth(t time.Time) {
+	m.birth = &t
+}
+
+// Birth returns the value of the "birth" field in the mutation.
+func (m *UserMutation) Birth() (r time.Time, exists bool) {
+	v := m.birth
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBirth returns the old "birth" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldBirth(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldBirth is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldBirth requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBirth: %w", err)
+	}
+	return oldValue.Birth, nil
+}
+
+// ClearBirth clears the value of the "birth" field.
+func (m *UserMutation) ClearBirth() {
+	m.birth = nil
+	m.clearedFields[user.FieldBirth] = struct{}{}
+}
+
+// BirthCleared returns if the "birth" field was cleared in this mutation.
+func (m *UserMutation) BirthCleared() bool {
+	_, ok := m.clearedFields[user.FieldBirth]
+	return ok
+}
+
+// ResetBirth resets all changes to the "birth" field.
+func (m *UserMutation) ResetBirth() {
+	m.birth = nil
+	delete(m.clearedFields, user.FieldBirth)
+}
+
 // Op returns the operation name.
 func (m *UserMutation) Op() Op {
 	return m.op
@@ -911,12 +962,15 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+	fields := make([]string, 0, 3)
 	if m.uid != nil {
 		fields = append(fields, user.FieldUID)
 	}
 	if m.name != nil {
 		fields = append(fields, user.FieldName)
+	}
+	if m.birth != nil {
+		fields = append(fields, user.FieldBirth)
 	}
 	return fields
 }
@@ -930,6 +984,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.UID()
 	case user.FieldName:
 		return m.Name()
+	case user.FieldBirth:
+		return m.Birth()
 	}
 	return nil, false
 }
@@ -943,6 +999,8 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldUID(ctx)
 	case user.FieldName:
 		return m.OldName(ctx)
+	case user.FieldBirth:
+		return m.OldBirth(ctx)
 	}
 	return nil, fmt.Errorf("unknown User field %s", name)
 }
@@ -965,6 +1023,13 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetName(v)
+		return nil
+	case user.FieldBirth:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBirth(v)
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)
@@ -995,7 +1060,11 @@ func (m *UserMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *UserMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(user.FieldBirth) {
+		fields = append(fields, user.FieldBirth)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -1008,6 +1077,11 @@ func (m *UserMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *UserMutation) ClearField(name string) error {
+	switch name {
+	case user.FieldBirth:
+		m.ClearBirth()
+		return nil
+	}
 	return fmt.Errorf("unknown User nullable field %s", name)
 }
 
@@ -1020,6 +1094,9 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldName:
 		m.ResetName()
+		return nil
+	case user.FieldBirth:
+		m.ResetBirth()
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)

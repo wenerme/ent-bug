@@ -1,5 +1,5 @@
 gen:
-	go run -mod=mod entgo.io/ent/cmd/ent generate ./ent/schema
+	go run -mod=mod entgo.io/ent/cmd/ent generate --feature graphql ./ent/schema
 
 gen-test: gen test
 
@@ -31,3 +31,6 @@ start-pg:
 
 stop-pg:
 	docker rm -f pg-test
+
+tidy:
+	go mod tidy
