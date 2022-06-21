@@ -760,6 +760,10 @@ type ServiceAccountMutation struct {
 	op            Op
 	typ           string
 	id            *string
+	sid           *int
+	addsid        *int
+	tid           *int
+	addtid        *int
 	displayName   *string
 	disabled      *bool
 	username      *string
@@ -872,6 +876,118 @@ func (m *ServiceAccountMutation) IDs(ctx context.Context) ([]string, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetSid sets the "sid" field.
+func (m *ServiceAccountMutation) SetSid(i int) {
+	m.sid = &i
+	m.addsid = nil
+}
+
+// Sid returns the value of the "sid" field in the mutation.
+func (m *ServiceAccountMutation) Sid() (r int, exists bool) {
+	v := m.sid
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSid returns the old "sid" field's value of the ServiceAccount entity.
+// If the ServiceAccount object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ServiceAccountMutation) OldSid(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSid is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSid requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSid: %w", err)
+	}
+	return oldValue.Sid, nil
+}
+
+// AddSid adds i to the "sid" field.
+func (m *ServiceAccountMutation) AddSid(i int) {
+	if m.addsid != nil {
+		*m.addsid += i
+	} else {
+		m.addsid = &i
+	}
+}
+
+// AddedSid returns the value that was added to the "sid" field in this mutation.
+func (m *ServiceAccountMutation) AddedSid() (r int, exists bool) {
+	v := m.addsid
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSid resets all changes to the "sid" field.
+func (m *ServiceAccountMutation) ResetSid() {
+	m.sid = nil
+	m.addsid = nil
+}
+
+// SetTid sets the "tid" field.
+func (m *ServiceAccountMutation) SetTid(i int) {
+	m.tid = &i
+	m.addtid = nil
+}
+
+// Tid returns the value of the "tid" field in the mutation.
+func (m *ServiceAccountMutation) Tid() (r int, exists bool) {
+	v := m.tid
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTid returns the old "tid" field's value of the ServiceAccount entity.
+// If the ServiceAccount object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ServiceAccountMutation) OldTid(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTid is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTid requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTid: %w", err)
+	}
+	return oldValue.Tid, nil
+}
+
+// AddTid adds i to the "tid" field.
+func (m *ServiceAccountMutation) AddTid(i int) {
+	if m.addtid != nil {
+		*m.addtid += i
+	} else {
+		m.addtid = &i
+	}
+}
+
+// AddedTid returns the value that was added to the "tid" field in this mutation.
+func (m *ServiceAccountMutation) AddedTid() (r int, exists bool) {
+	v := m.addtid
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTid resets all changes to the "tid" field.
+func (m *ServiceAccountMutation) ResetTid() {
+	m.tid = nil
+	m.addtid = nil
 }
 
 // SetDisplayName sets the "displayName" field.
@@ -1037,7 +1153,13 @@ func (m *ServiceAccountMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ServiceAccountMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 6)
+	if m.sid != nil {
+		fields = append(fields, serviceaccount.FieldSid)
+	}
+	if m.tid != nil {
+		fields = append(fields, serviceaccount.FieldTid)
+	}
 	if m.displayName != nil {
 		fields = append(fields, serviceaccount.FieldDisplayName)
 	}
@@ -1058,6 +1180,10 @@ func (m *ServiceAccountMutation) Fields() []string {
 // schema.
 func (m *ServiceAccountMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case serviceaccount.FieldSid:
+		return m.Sid()
+	case serviceaccount.FieldTid:
+		return m.Tid()
 	case serviceaccount.FieldDisplayName:
 		return m.DisplayName()
 	case serviceaccount.FieldDisabled:
@@ -1075,6 +1201,10 @@ func (m *ServiceAccountMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *ServiceAccountMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case serviceaccount.FieldSid:
+		return m.OldSid(ctx)
+	case serviceaccount.FieldTid:
+		return m.OldTid(ctx)
 	case serviceaccount.FieldDisplayName:
 		return m.OldDisplayName(ctx)
 	case serviceaccount.FieldDisabled:
@@ -1092,6 +1222,20 @@ func (m *ServiceAccountMutation) OldField(ctx context.Context, name string) (ent
 // type.
 func (m *ServiceAccountMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case serviceaccount.FieldSid:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSid(v)
+		return nil
+	case serviceaccount.FieldTid:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTid(v)
+		return nil
 	case serviceaccount.FieldDisplayName:
 		v, ok := value.(string)
 		if !ok {
@@ -1127,13 +1271,26 @@ func (m *ServiceAccountMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *ServiceAccountMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addsid != nil {
+		fields = append(fields, serviceaccount.FieldSid)
+	}
+	if m.addtid != nil {
+		fields = append(fields, serviceaccount.FieldTid)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *ServiceAccountMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case serviceaccount.FieldSid:
+		return m.AddedSid()
+	case serviceaccount.FieldTid:
+		return m.AddedTid()
+	}
 	return nil, false
 }
 
@@ -1142,6 +1299,20 @@ func (m *ServiceAccountMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *ServiceAccountMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case serviceaccount.FieldSid:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSid(v)
+		return nil
+	case serviceaccount.FieldTid:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTid(v)
+		return nil
 	}
 	return fmt.Errorf("unknown ServiceAccount numeric field %s", name)
 }
@@ -1169,6 +1340,12 @@ func (m *ServiceAccountMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *ServiceAccountMutation) ResetField(name string) error {
 	switch name {
+	case serviceaccount.FieldSid:
+		m.ResetSid()
+		return nil
+	case serviceaccount.FieldTid:
+		m.ResetTid()
+		return nil
 	case serviceaccount.FieldDisplayName:
 		m.ResetDisplayName()
 		return nil

@@ -87,3 +87,20 @@ func (ID2Mixin) Fields() []ent.Field {
 		),
 	}
 }
+
+type TenantSidMixin struct {
+	mixin.Schema
+}
+
+func (TenantSidMixin) Fields() []ent.Field {
+	return []ent.Field{
+		field.Int("sid").Immutable().Annotations(
+		// entgql.OrderField("Sid"),
+		// FieldAnnotation{CanUpdate: TernaryNo, CanCreate: TernaryNo, CanSort: TernaryYes},
+		),
+		field.Int("tid").Immutable().Annotations(
+			// FieldAnnotation{CanUpdate: TernaryNo, CanCreate: TernaryNo, ServerOnly: TernaryYes},
+			&entsql.Annotation{Default: "current_setting('tenant.id')::bigint"},
+		),
+	}
+}

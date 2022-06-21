@@ -42,6 +42,8 @@ var (
 	// ServiceAccountsColumns holds the columns for the "service_accounts" table.
 	ServiceAccountsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Unique: true, Default: "public.generate_ulid()"},
+		{Name: "sid", Type: field.TypeInt},
+		{Name: "tid", Type: field.TypeInt, Default: "current_setting('tenant.id')::bigint"},
 		{Name: "display_name", Type: field.TypeString},
 		{Name: "disabled", Type: field.TypeBool, Default: false},
 		{Name: "username", Type: field.TypeString},

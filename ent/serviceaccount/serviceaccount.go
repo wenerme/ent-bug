@@ -7,6 +7,10 @@ const (
 	Label = "service_account"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldSid holds the string denoting the sid field in the database.
+	FieldSid = "sid"
+	// FieldTid holds the string denoting the tid field in the database.
+	FieldTid = "tid"
 	// FieldDisplayName holds the string denoting the displayname field in the database.
 	FieldDisplayName = "display_name"
 	// FieldDisabled holds the string denoting the disabled field in the database.
@@ -22,6 +26,8 @@ const (
 // Columns holds all SQL columns for serviceaccount fields.
 var Columns = []string{
 	FieldID,
+	FieldSid,
+	FieldTid,
 	FieldDisplayName,
 	FieldDisabled,
 	FieldUsername,

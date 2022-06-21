@@ -15,6 +15,10 @@ type ServiceAccount struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID string `json:"id,omitempty"`
+	// Sid holds the value of the "sid" field.
+	Sid int `json:"sid,omitempty"`
+	// Tid holds the value of the "tid" field.
+	Tid int `json:"tid,omitempty"`
 	// DisplayName holds the value of the "displayName" field.
 	DisplayName string `json:"displayName,omitempty"`
 	// Disabled holds the value of the "disabled" field.
@@ -32,6 +36,8 @@ func (*ServiceAccount) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case serviceaccount.FieldDisabled:
 			values[i] = new(sql.NullBool)
+		case serviceaccount.FieldSid, serviceaccount.FieldTid:
+			values[i] = new(sql.NullInt64)
 		case serviceaccount.FieldID, serviceaccount.FieldDisplayName, serviceaccount.FieldUsername, serviceaccount.FieldPassword:
 			values[i] = new(sql.NullString)
 		default:
@@ -54,6 +60,18 @@ func (sa *ServiceAccount) assignValues(columns []string, values []interface{}) e
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value.Valid {
 				sa.ID = value.String
+			}
+		case serviceaccount.FieldSid:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field sid", values[i])
+			} else if value.Valid {
+				sa.Sid = int(value.Int64)
+			}
+		case serviceaccount.FieldTid:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field tid", values[i])
+			} else if value.Valid {
+				sa.Tid = int(value.Int64)
 			}
 		case serviceaccount.FieldDisplayName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -107,6 +125,12 @@ func (sa *ServiceAccount) String() string {
 	var builder strings.Builder
 	builder.WriteString("ServiceAccount(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", sa.ID))
+	builder.WriteString("sid=")
+	builder.WriteString(fmt.Sprintf("%v", sa.Sid))
+	builder.WriteString(", ")
+	builder.WriteString("tid=")
+	builder.WriteString(fmt.Sprintf("%v", sa.Tid))
+	builder.WriteString(", ")
 	builder.WriteString("displayName=")
 	builder.WriteString(sa.DisplayName)
 	builder.WriteString(", ")

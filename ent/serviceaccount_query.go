@@ -253,12 +253,12 @@ func (saq *ServiceAccountQuery) Clone() *ServiceAccountQuery {
 // Example:
 //
 //	var v []struct {
-//		DisplayName string `json:"displayName,omitempty"`
+//		Sid int `json:"sid,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.ServiceAccount.Query().
-//		GroupBy(serviceaccount.FieldDisplayName).
+//		GroupBy(serviceaccount.FieldSid).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -282,11 +282,11 @@ func (saq *ServiceAccountQuery) GroupBy(field string, fields ...string) *Service
 // Example:
 //
 //	var v []struct {
-//		DisplayName string `json:"displayName,omitempty"`
+//		Sid int `json:"sid,omitempty"`
 //	}
 //
 //	client.ServiceAccount.Query().
-//		Select(serviceaccount.FieldDisplayName).
+//		Select(serviceaccount.FieldSid).
 //		Scan(ctx, &v)
 //
 func (saq *ServiceAccountQuery) Select(fields ...string) *ServiceAccountSelect {

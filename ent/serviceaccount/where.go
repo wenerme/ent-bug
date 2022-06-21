@@ -90,6 +90,20 @@ func IDLTE(id string) predicate.ServiceAccount {
 	})
 }
 
+// Sid applies equality check predicate on the "sid" field. It's identical to SidEQ.
+func Sid(v int) predicate.ServiceAccount {
+	return predicate.ServiceAccount(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldSid), v))
+	})
+}
+
+// Tid applies equality check predicate on the "tid" field. It's identical to TidEQ.
+func Tid(v int) predicate.ServiceAccount {
+	return predicate.ServiceAccount(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldTid), v))
+	})
+}
+
 // DisplayName applies equality check predicate on the "displayName" field. It's identical to DisplayNameEQ.
 func DisplayName(v string) predicate.ServiceAccount {
 	return predicate.ServiceAccount(func(s *sql.Selector) {
@@ -115,6 +129,158 @@ func Username(v string) predicate.ServiceAccount {
 func Password(v string) predicate.ServiceAccount {
 	return predicate.ServiceAccount(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldPassword), v))
+	})
+}
+
+// SidEQ applies the EQ predicate on the "sid" field.
+func SidEQ(v int) predicate.ServiceAccount {
+	return predicate.ServiceAccount(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldSid), v))
+	})
+}
+
+// SidNEQ applies the NEQ predicate on the "sid" field.
+func SidNEQ(v int) predicate.ServiceAccount {
+	return predicate.ServiceAccount(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldSid), v))
+	})
+}
+
+// SidIn applies the In predicate on the "sid" field.
+func SidIn(vs ...int) predicate.ServiceAccount {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.ServiceAccount(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldSid), v...))
+	})
+}
+
+// SidNotIn applies the NotIn predicate on the "sid" field.
+func SidNotIn(vs ...int) predicate.ServiceAccount {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.ServiceAccount(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldSid), v...))
+	})
+}
+
+// SidGT applies the GT predicate on the "sid" field.
+func SidGT(v int) predicate.ServiceAccount {
+	return predicate.ServiceAccount(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldSid), v))
+	})
+}
+
+// SidGTE applies the GTE predicate on the "sid" field.
+func SidGTE(v int) predicate.ServiceAccount {
+	return predicate.ServiceAccount(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldSid), v))
+	})
+}
+
+// SidLT applies the LT predicate on the "sid" field.
+func SidLT(v int) predicate.ServiceAccount {
+	return predicate.ServiceAccount(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldSid), v))
+	})
+}
+
+// SidLTE applies the LTE predicate on the "sid" field.
+func SidLTE(v int) predicate.ServiceAccount {
+	return predicate.ServiceAccount(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldSid), v))
+	})
+}
+
+// TidEQ applies the EQ predicate on the "tid" field.
+func TidEQ(v int) predicate.ServiceAccount {
+	return predicate.ServiceAccount(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldTid), v))
+	})
+}
+
+// TidNEQ applies the NEQ predicate on the "tid" field.
+func TidNEQ(v int) predicate.ServiceAccount {
+	return predicate.ServiceAccount(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldTid), v))
+	})
+}
+
+// TidIn applies the In predicate on the "tid" field.
+func TidIn(vs ...int) predicate.ServiceAccount {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.ServiceAccount(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldTid), v...))
+	})
+}
+
+// TidNotIn applies the NotIn predicate on the "tid" field.
+func TidNotIn(vs ...int) predicate.ServiceAccount {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.ServiceAccount(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldTid), v...))
+	})
+}
+
+// TidGT applies the GT predicate on the "tid" field.
+func TidGT(v int) predicate.ServiceAccount {
+	return predicate.ServiceAccount(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldTid), v))
+	})
+}
+
+// TidGTE applies the GTE predicate on the "tid" field.
+func TidGTE(v int) predicate.ServiceAccount {
+	return predicate.ServiceAccount(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldTid), v))
+	})
+}
+
+// TidLT applies the LT predicate on the "tid" field.
+func TidLT(v int) predicate.ServiceAccount {
+	return predicate.ServiceAccount(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldTid), v))
+	})
+}
+
+// TidLTE applies the LTE predicate on the "tid" field.
+func TidLTE(v int) predicate.ServiceAccount {
+	return predicate.ServiceAccount(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldTid), v))
 	})
 }
 

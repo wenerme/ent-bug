@@ -99,6 +99,7 @@ go-ent-describe:
 go-ent-gen:
 	go generate ./ent
 	$(MAKE) fmt
+	git add ent
 endif
 
 ifneq ("$(wildcard atlas.hcl)","")

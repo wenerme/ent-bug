@@ -28,5 +28,6 @@ func (ServiceAccount) Edges() []ent.Edge {
 func (ServiceAccount) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		ID2Mixin{},
+		TenantSidMixin{},
 	}
 }

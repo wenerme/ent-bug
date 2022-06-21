@@ -19,6 +19,18 @@ type ServiceAccountCreate struct {
 	hooks    []Hook
 }
 
+// SetSid sets the "sid" field.
+func (sac *ServiceAccountCreate) SetSid(i int) *ServiceAccountCreate {
+	sac.mutation.SetSid(i)
+	return sac
+}
+
+// SetTid sets the "tid" field.
+func (sac *ServiceAccountCreate) SetTid(i int) *ServiceAccountCreate {
+	sac.mutation.SetTid(i)
+	return sac
+}
+
 // SetDisplayName sets the "displayName" field.
 func (sac *ServiceAccountCreate) SetDisplayName(s string) *ServiceAccountCreate {
 	sac.mutation.SetDisplayName(s)
@@ -154,6 +166,12 @@ func (sac *ServiceAccountCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (sac *ServiceAccountCreate) check() error {
+	if _, ok := sac.mutation.Sid(); !ok {
+		return &ValidationError{Name: "sid", err: errors.New(`ent: missing required field "ServiceAccount.sid"`)}
+	}
+	if _, ok := sac.mutation.Tid(); !ok {
+		return &ValidationError{Name: "tid", err: errors.New(`ent: missing required field "ServiceAccount.tid"`)}
+	}
 	if _, ok := sac.mutation.DisplayName(); !ok {
 		return &ValidationError{Name: "displayName", err: errors.New(`ent: missing required field "ServiceAccount.displayName"`)}
 	}
@@ -206,6 +224,22 @@ func (sac *ServiceAccountCreate) createSpec() (*ServiceAccount, *sqlgraph.Create
 	if id, ok := sac.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
+	}
+	if value, ok := sac.mutation.Sid(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: serviceaccount.FieldSid,
+		})
+		_node.Sid = value
+	}
+	if value, ok := sac.mutation.Tid(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: serviceaccount.FieldTid,
+		})
+		_node.Tid = value
 	}
 	if value, ok := sac.mutation.DisplayName(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
