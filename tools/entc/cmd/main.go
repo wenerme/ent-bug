@@ -1,12 +1,13 @@
 package main
 
 import (
-	"entgo.io/contrib/entgql"
-	"entgo.io/ent/entc"
-	"entgo.io/ent/entc/gen"
 	"fmt"
 	"log"
 	"path/filepath"
+
+	"entgo.io/contrib/entgql"
+	"entgo.io/ent/entc"
+	"entgo.io/ent/entc/gen"
 )
 
 func main() {

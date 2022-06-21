@@ -21,11 +21,13 @@ func (HasOwnerMixin) Fields() []ent.Field {
 		field.UUID("ownerUID", uuid.New()).Optional().Nillable(),
 	}
 }
+
 func (HasOwnerMixin) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("ownerType", "ownerID"),
 	}
 }
+
 func (HasOwnerMixin) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("owningUser", User.Type).Field("owningUserID").Unique(),

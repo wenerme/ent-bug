@@ -3,6 +3,9 @@ package test
 import (
 	"context"
 	"database/sql"
+	"log"
+	"testing"
+
 	entsql "entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/schema"
 	"github.com/davecgh/go-spew/spew"
@@ -10,8 +13,6 @@ import (
 	"github.com/wenerme/ent-demo/ent"
 	"github.com/wenerme/ent-demo/ent/enttest"
 	"github.com/wenerme/ent-demo/ent/migrate"
-	"log"
-	"testing"
 )
 
 func TestPGMir(t *testing.T) {

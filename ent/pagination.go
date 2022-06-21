@@ -654,18 +654,16 @@ func (u *UserQuery) Paginate(
 	return conn, nil
 }
 
-var (
-	// UserOrderFieldBirth orders User by birth.
-	UserOrderFieldBirth = &UserOrderField{
-		field: user.FieldBirth,
-		toCursor: func(u *User) Cursor {
-			return Cursor{
-				ID:    u.ID,
-				Value: u.Birth,
-			}
-		},
-	}
-)
+// UserOrderFieldBirth orders User by birth.
+var UserOrderFieldBirth = &UserOrderField{
+	field: user.FieldBirth,
+	toCursor: func(u *User) Cursor {
+		return Cursor{
+			ID:    u.ID,
+			Value: u.Birth,
+		}
+	},
+}
 
 // String implement fmt.Stringer interface.
 func (f UserOrderField) String() string {

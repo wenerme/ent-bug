@@ -17,16 +17,18 @@ func (AuditorMixin) Fields() []ent.Field {
 		field.Int("createdByID").Optional().Nillable(),
 	}
 }
+
 func (AuditorMixin) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("createdByID"),
 	}
 }
+
 func (AuditorMixin) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("createdBy", User.Type).From("creator").Field("createdByID").Unique(),
-		//edge.To("created", User.Type),
-		//edge.From("createdBy", User.Type).
+		// edge.To("created", User.Type),
+		// edge.From("createdBy", User.Type).
 		//	Unique().
 		//	Field("createdByID"),
 	}

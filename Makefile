@@ -1,3 +1,6 @@
+REPO_ROOT ?= $(shell git rev-parse --show-toplevel)
+-include $(REPO_ROOT)/mod.mk
+
 gen:
 	go run -mod=mod entgo.io/ent/cmd/ent generate --feature graphql ./ent/schema
 
@@ -31,6 +34,3 @@ start-pg:
 
 stop-pg:
 	docker rm -f pg-test
-
-tidy:
-	go mod tidy

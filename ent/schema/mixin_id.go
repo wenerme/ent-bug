@@ -2,6 +2,10 @@ package schema
 
 import (
 	"context"
+
+	"github.com/wenerme/ent-demo/utils/ulids"
+	"github.com/wenerme/wego/stdx"
+
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/field"
@@ -12,7 +16,7 @@ import (
 
 var idPtrType = models.ID("")
 
-//var idPtrType = (*models.ID)(nil)
+// var idPtrType = (*models.ID)(nil)
 var idType = models.ID("")
 
 type IDMixin struct {
@@ -21,7 +25,7 @@ type IDMixin struct {
 
 func (IDMixin) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id").GoType(idType).Unique().Immutable().Annotations(),
+		field.String("id").GoType(models.ID("")).Unique().Immutable().Annotations(),
 		//field.UUID("uid", new(uuid.UUID)).Default(func() *uuid.UUID {
 		//	u := uuid.New()
 		//	return &u
@@ -36,6 +40,7 @@ func (IDMixin) Fields() []ent.Field {
 		),
 	}
 }
+
 func (IDMixin) Hooks() []ent.Hook {
 	return []ent.Hook{
 		HookID(),
@@ -63,4 +68,22 @@ func HookID() ent.Hook {
 var NextID = func(ctx context.Context, mutation ent.Mutation) (models.ID, error) {
 	// test only
 	return models.ID(uuid.New().String()), nil
+}
+
+type ID2Mixin struct {
+	mixin.Schema
+}
+
+func (ID2Mixin) Fields() []ent.Field {
+	return []ent.Field{
+		field.String("id").DefaultFunc(func() string {
+			return stdx.Must(ulids.New()).String()
+		}).Unique().Immutable().Annotations(
+			&entsql.Annotation{
+				Default: "public.generate_ulid()",
+			},
+			// entgql.OrderField("Id"),
+			// FieldAnnotation{CanUpdate: TernaryNo, CanCreate: TernaryNo, CanSort: TernaryYes},
+		),
+	}
 }
